@@ -2,20 +2,17 @@
 
 int main(int argc, char *args[])
 {
-
     if (iniciaJanela())
     {
-        // start();
-
-        Uint32 frameStart;
-        int frameTime;
-
+        inicio();
         while (1)
         {
             frameStart = SDL_GetTicks();
 
-            processarEventos(&e, &movDireita, &movEsquerda, &pulando, &quadrado, &velocidadeY, &alturaInicial);
+            processarEventos(&e, &movDireita, &movEsquerda, &pulando,
+                             &quadrado, &velocidadeY, &alturaInicial);
 
+            // Movimento
             if (movDireita)
             {
                 quadrado.x += VELOCIDADE_MOVIMENTO;
@@ -24,7 +21,6 @@ int main(int argc, char *args[])
             {
                 quadrado.x -= VELOCIDADE_MOVIMENTO;
             }
-
             if (pulando)
             {
                 quadrado.y += velocidadeY;
@@ -37,7 +33,7 @@ int main(int argc, char *args[])
                 }
             }
 
-            renderiza(&quadrado);
+            renderizaJogador(&quadrado);
 
             frameTime = SDL_GetTicks() - frameStart;
 
