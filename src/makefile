@@ -6,3 +6,4 @@ all : $(OBJS)
 	clear
 	gcc $(OBJS) -lSDL2 -lSDL2_ttf -o $(OBJ_NAME) -Wall
 	./$(OBJ_NAME)
+

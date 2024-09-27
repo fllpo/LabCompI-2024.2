@@ -3,16 +3,22 @@
 
 int main(int argc, char *args[])
 {
+    printf("Para fins de teste:\n\nEspaco:pula e +100 pontos\nC:-1 vida\n");
     if (iniciaJanela())
     {
-        inicio();
-        while (1)
+        telaInicial();
+        while (fichas > 0)
         {
-            frameStart = SDL_GetTicks();
+            quadrado.vida = 3;
 
-            processaEventos(&e);
+            while (quadrado.vida > 0)
+            {
+                frameStart = SDL_GetTicks();
+                processaEventos(&e);
+                renderiza();
+            }
 
-            renderiza();
+            telaFinal();
         }
     }
     else

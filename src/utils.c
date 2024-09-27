@@ -61,15 +61,15 @@ void renderiza()
     SDL_RenderClear(renderizador);
 
     renderizaJogador(&quadrado);
-    exibeFichas(fichas);
-
-    SDL_RenderPresent(renderizador);
+    exibeVida(&quadrado);
+    exibePontos(pontos);
 
     frameTime = SDL_GetTicks() - frameStart;
     if (frameTime < FRAME_TIME)
     {
         SDL_Delay(FRAME_TIME - frameTime);
     }
+    SDL_RenderPresent(renderizador);
 }
 
 void processaEventos(SDL_Event *e)
@@ -91,9 +91,11 @@ void processaEventos(SDL_Event *e)
             case SDLK_m:
                 // menu();
                 break;
+            case SDLK_c:
+                quadrado.vida--;
+                break;
             case SDLK_d:
                 movDireita = true;
-
                 break;
             case SDLK_a:
                 movEsquerda = true;
@@ -105,6 +107,8 @@ void processaEventos(SDL_Event *e)
                     velocidadeY = FORCA_SALTO;
                     alturaInicial = quadrado.y;
                 }
+                pontos = pontos + 100;
+
                 break;
             }
         }
@@ -128,7 +132,18 @@ void exibeFichas(int fichas)
     sprintf(texto, "Fichas: %d", fichas);
     escreveTexto(texto, 10, 10, BRANCO);
 }
-
+void exibePontos(int pontos)
+{
+    char texto[50];
+    sprintf(texto, "Pontos:%d", pontos);
+    escreveTexto(texto, TELA_LARGURA - 200, 10, BRANCO);
+}
+void exibeVida(Player *quadrado)
+{
+    char texto[50];
+    sprintf(texto, "Vida: %d", quadrado->vida);
+    escreveTexto(texto, 10, 10, BRANCO);
+}
 void escreveTexto(char *texto, int x, int y, SDL_Color cor)
 {
     SDL_Surface *textoSuperficie = TTF_RenderText_Solid(fonte, texto, cor);
@@ -139,7 +154,79 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
 }
 
-void inicio()
+void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO
+{
+    char recorde[10];
+    sprintf(recorde, "%s %d\n", nomeJogador, maiorPonto);
+    FILE *arquivo = fopen("bin/score.bin", "ab");
+    if (arquivo != NULL)
+    {
+        fwrite(recorde, sizeof(recorde), 1, arquivo);
+        fclose(arquivo);
+    }
+    else
+        perror("Erro ao abrir arquivo score.bin");
+}
+void lerRecordes() // TODO
+{
+    char score[1024];
+    FILE *arquivo = fopen("bin/score.bin", "rb");
+    if (arquivo != NULL)
+    {
+        fread(&score, sizeof(score), 1024, arquivo);
+        fclose(arquivo);
+    }
+    else
+        perror("Erro ao abrir arquivo score.bin");
+}
+
+void telaFinal()
+{
+    fichas--;
+    int final = 1;
+    while (final)
+    {
+        SDL_RenderClear(renderizador);
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+        if (fichas == 0)
+            escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
+
+        else
+        {
+            escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
+            exibeFichas(fichas);
+        }
+
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                destroi(janela);
+                exit(0);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    destroi(janela);
+                    exit(0);
+                case SDLK_RETURN:
+                    final = 0;
+                    break;
+                }
+            }
+        }
+        SDL_RenderPresent(renderizador);
+    }
+    if (maiorPonto < pontos)
+    {
+        maiorPonto = pontos;
+        gravarRecordes("FEL", maiorPonto);
+    }
+    pontos = 0;
+}
+void telaInicial()
 {
 
     for (int i = 0; i < 200; i++)
@@ -150,6 +237,7 @@ void inicio()
     }
 
     int inicial = 1;
+    fichas = 3;
 
     while (inicial)
     {
@@ -157,6 +245,9 @@ void inicio()
 
         escreveTexto("Por Andre, Fellipe e Guilherme.", 100, 100, BRANCO);
         escreveTexto("Pressione Enter", 200, 200, BRANCO);
+        exibeFichas(fichas);
+
+        escreveTexto("Use A,D e espaco para se movimentar", 200, 500, BRANCO);
 
         while (SDL_PollEvent(&e))
         {
@@ -174,7 +265,6 @@ void inicio()
                     exit(0);
                 case SDLK_RETURN:
                     inicial = 0;
-                    fichas = 3;
                     break;
                 }
             }
