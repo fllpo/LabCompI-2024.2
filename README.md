@@ -16,11 +16,28 @@ Insira um gif ou um link de alguma demonstração
 - [@Fellipe Oliveira](https://www.github.com/fllpo)
 - [@Guilherme](https://www.github.com/)
 
-## Instalação e execução
+## Rodando localmente
 
-Com o arquivo baixado execute no terminal Linux:
+Clone o projeto
 
 ```bash
-  cd src
+  git clone https://github.com/fllpo/LabCompI-2024.2.git
+```
+
+Entre no diretório do projeto
+
+```bash
+  cd LabCompI-2024.2
+```
+
+Instale as dependências
+
+```bash
+  sudo apt-get install libsdl2-dev
+```
+
+Execute
+
+```bash
   make
 ```

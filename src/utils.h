@@ -18,8 +18,6 @@
 #define FORCA_SALTO -20
 
 float velocidadeY = 0;
-int alturaInicial = 0, fichas = 0, pontos = 0, maiorPonto = 0;
-bool movDireita = false, movEsquerda = false, pulando = true;
 
 SDL_Window *janela = NULL;
 SDL_Renderer *renderizador = NULL;

@@ -13,7 +13,7 @@ int iniciaJanela(void)
         printf("Erro ao iniciar TTF: %s\n", TTF_GetError());
         return 0;
     }
-    fonte = TTF_OpenFont("../assets/font/Roboto.ttf", 25);
+    fonte = TTF_OpenFont("assets/font/Roboto.ttf", 25);
     if (fonte == NULL)
     {
         printf("Erro ao encontrar fonte\n");
@@ -61,8 +61,8 @@ void renderiza()
     SDL_RenderClear(renderizador);
 
     renderizaJogador(&quadrado);
-    exibeVida(&quadrado);
-    exibePontos(pontos);
+    exibeVida(quadrado.vida);
+    exibePontos(quadrado.pontos);
 
     frameTime = SDL_GetTicks() - frameStart;
     if (frameTime < FRAME_TIME)
@@ -95,19 +95,19 @@ void processaEventos(SDL_Event *e)
                 quadrado.vida--;
                 break;
             case SDLK_d:
-                movDireita = true;
+                quadrado.movDireita = true;
                 break;
             case SDLK_a:
-                movEsquerda = true;
+                quadrado.movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!pulando)
+                if (!quadrado.pulando)
                 {
-                    pulando = true;
+                    quadrado.pulando = true;
                     velocidadeY = FORCA_SALTO;
                     alturaInicial = quadrado.y;
                 }
-                pontos = pontos + 100;
+                quadrado.pontos = quadrado.pontos + 100;
 
                 break;
             }
@@ -117,10 +117,10 @@ void processaEventos(SDL_Event *e)
             switch (e->key.keysym.sym)
             {
             case SDLK_d:
-                movDireita = false;
+                quadrado.movDireita = false;
                 break;
             case SDLK_a:
-                movEsquerda = false;
+                quadrado.movEsquerda = false;
                 break;
             }
         }
@@ -138,10 +138,10 @@ void exibePontos(int pontos)
     sprintf(texto, "Pontos:%d", pontos);
     escreveTexto(texto, TELA_LARGURA - 200, 10, BRANCO);
 }
-void exibeVida(Player *quadrado)
+void exibeVida(int vida)
 {
     char texto[50];
-    sprintf(texto, "Vida: %d", quadrado->vida);
+    sprintf(texto, "Vida: %d", vida);
     escreveTexto(texto, 10, 10, BRANCO);
 }
 void escreveTexto(char *texto, int x, int y, SDL_Color cor)
@@ -154,14 +154,15 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
 }
 
-void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO
+void gravarRecordes(char *nomeJogador, int maiorPonto)
 {
-    char recorde[10];
-    sprintf(recorde, "%s %d\n", nomeJogador, maiorPonto);
-    FILE *arquivo = fopen("bin/score.bin", "ab");
+    char registro[10];
+    sprintf(registro, "%s %d\n", nomeJogador, maiorPontuacao);
+    FILE *arquivo = fopen("src/bin/score.bin", "ab");
     if (arquivo != NULL)
     {
-        fwrite(recorde, sizeof(recorde), 1, arquivo);
+        fwrite(registro, sizeof(registro), 1, arquivo);
+
         fclose(arquivo);
     }
     else
@@ -169,11 +170,12 @@ void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO
 }
 void lerRecordes() // TODO
 {
-    char score[1024];
-    FILE *arquivo = fopen("bin/score.bin", "rb");
+
+    FILE *arquivo = fopen("src/bin/score.bin", "rb");
     if (arquivo != NULL)
     {
-        fread(&score, sizeof(score), 1024, arquivo);
+        // fread(&score, sizeof(score), 1024, arquivo);
+
         fclose(arquivo);
     }
     else
@@ -182,19 +184,20 @@ void lerRecordes() // TODO
 
 void telaFinal()
 {
-    fichas--;
+    quadrado.fichas--;
     int final = 1;
     while (final)
     {
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (fichas == 0)
+        if (quadrado.fichas == 0)
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
 
         else
         {
+
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
-            exibeFichas(fichas);
+            exibeFichas(quadrado.fichas);
         }
 
         while (SDL_PollEvent(&e))
@@ -219,13 +222,14 @@ void telaFinal()
         }
         SDL_RenderPresent(renderizador);
     }
-    if (maiorPonto < pontos)
+    if (maiorPontuacao < quadrado.pontos)
     {
-        maiorPonto = pontos;
-        gravarRecordes("FEL", maiorPonto);
+        maiorPontuacao = quadrado.pontos;
+        gravarRecordes("FEL", maiorPontuacao);
+        // lerRecordes();
     }
-    pontos = 0;
 }
+
 void telaInicial()
 {
 
@@ -237,7 +241,7 @@ void telaInicial()
     }
 
     int inicial = 1;
-    fichas = 3;
+    quadrado.fichas = 3;
 
     while (inicial)
     {
@@ -245,7 +249,7 @@ void telaInicial()
 
         escreveTexto("Por Andre, Fellipe e Guilherme.", 100, 100, BRANCO);
         escreveTexto("Pressione Enter", 200, 200, BRANCO);
-        exibeFichas(fichas);
+        exibeFichas(quadrado.fichas);
 
         escreveTexto("Use A,D e espaco para se movimentar", 200, 500, BRANCO);
 

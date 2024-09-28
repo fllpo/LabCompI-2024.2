@@ -3,15 +3,15 @@
 
 void moveJogador()
 {
-    if (movDireita)
+    if (quadrado.movDireita)
     {
         quadrado.x += VELOCIDADE_MOVIMENTO;
     }
-    if (movEsquerda)
+    if (quadrado.movEsquerda)
     {
         quadrado.x -= VELOCIDADE_MOVIMENTO;
     }
-    if (pulando)
+    if (quadrado.pulando)
     {
         quadrado.y += velocidadeY;
         velocidadeY += GRAVIDADE;
@@ -19,7 +19,7 @@ void moveJogador()
         if (quadrado.y >= TELA_ALTURA - quadrado.h)
         {
             quadrado.y = TELA_ALTURA - quadrado.h;
-            pulando = false;
+            quadrado.pulando = false;
         }
     }
 }
