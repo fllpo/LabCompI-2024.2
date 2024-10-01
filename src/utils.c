@@ -154,34 +154,78 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
 }
 
-void gravarRecordes(char *nomeJogador, int maiorPonto)
+void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO: Ordenação de recordes; Receber nomes dinamicamente
 {
     char registro[10];
-    sprintf(registro, "%s %d\n", nomeJogador, maiorPontuacao);
+    sprintf(registro, "%s %d\n", nomeJogador, maiorPonto);
     FILE *arquivo = fopen("src/bin/score.bin", "ab");
     if (arquivo != NULL)
     {
         fwrite(registro, sizeof(registro), 1, arquivo);
-
         fclose(arquivo);
     }
     else
         perror("Erro ao abrir arquivo score.bin");
 }
-void lerRecordes() // TODO
+
+void telaRecordes()
 {
 
     FILE *arquivo = fopen("src/bin/score.bin", "rb");
-    if (arquivo != NULL)
+    char score[10];
+
+    int menu = 1;
+
+    while (menu)
     {
-        // fread(&score, sizeof(score), 1024, arquivo);
+        SDL_RenderClear(renderizador);
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+        escreveTexto("Recorde", TELA_LARGURA / 2 - 50, 50, BRANCO);
 
-        fclose(arquivo);
+        if (arquivo != NULL)
+        {
+            fseek(arquivo, 0, SEEK_SET);
+            for (int i = 0; i < 15; i++)
+            {
+                fread(&score, sizeof(score), 1, arquivo);
+
+                escreveTexto(score, TELA_LARGURA / 2 - 50, 100 + (i * 30), BRANCO);
+            }
+        }
+        else
+            perror("Erro ao abrir arquivo score.bin");
+
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                destroi(janela);
+                exit(0);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    destroi(janela);
+                    exit(0);
+                case SDLK_RETURN:
+                    menu = 0;
+                    break;
+                case SDLK_r:
+                    menu = 0;
+                    break;
+                }
+            }
+        }
+
+        SDL_RenderPresent(renderizador);
     }
-    else
-        perror("Erro ao abrir arquivo score.bin");
+    fclose(arquivo);
 }
-
+void telaMenu()
+{
+}
 void telaFinal()
 {
     quadrado.fichas--;
@@ -191,11 +235,13 @@ void telaFinal()
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         if (quadrado.fichas == 0)
+        {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
+            telaRecordes();
+        }
 
         else
         {
-
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
             exibeFichas(quadrado.fichas);
         }
@@ -222,11 +268,10 @@ void telaFinal()
         }
         SDL_RenderPresent(renderizador);
     }
-    if (maiorPontuacao < quadrado.pontos)
+    if (quadrado.recorde < quadrado.pontos)
     {
-        maiorPontuacao = quadrado.pontos;
-        gravarRecordes("FEL", maiorPontuacao);
-        // lerRecordes();
+        quadrado.recorde = quadrado.pontos;
+        gravarRecordes("FEL", quadrado.recorde);
     }
 }
 
@@ -248,7 +293,8 @@ void telaInicial()
         SDL_RenderClear(renderizador);
 
         escreveTexto("Por Andre, Fellipe e Guilherme.", 100, 100, BRANCO);
-        escreveTexto("Pressione Enter", 200, 200, BRANCO);
+        escreveTexto("Pressione Enter para iniciar jogo", 200, 200, BRANCO);
+        escreveTexto("Pressione R para recordes", 200, 300, BRANCO);
         exibeFichas(quadrado.fichas);
 
         escreveTexto("Use A,D e espaco para se movimentar", 200, 500, BRANCO);
@@ -267,6 +313,9 @@ void telaInicial()
                 case SDLK_ESCAPE:
                     destroi(janela);
                     exit(0);
+                case SDLK_r:
+                    telaRecordes();
+                    break;
                 case SDLK_RETURN:
                     inicial = 0;
                     break;

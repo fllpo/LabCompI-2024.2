@@ -5,6 +5,7 @@ void iniciaJogador(Player *quadrado)
 {
     quadrado->vida = 3;
     quadrado->pontos = 0;
+    quadrado->recorde = 0;
     quadrado->movDireita = false;
     quadrado->movEsquerda = false;
     quadrado->pulando = true;
