@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +24,7 @@ SDL_Window *janela = NULL;
 SDL_Renderer *renderizador = NULL;
 SDL_Surface *telaSuperficie = NULL;
 SDL_Color BRANCO = {255, 255, 255, 255};
-SDL_Color APAGADO = {255, 255, 255, 0};
+SDL_Color PRETO = {0, 0, 0, 255};
 SDL_Event e;
 TTF_Font *fonte;
 
@@ -32,6 +33,7 @@ int frameTime;
 int iniciaJanela();
 void destroi();
 void telaInicial();
+void telaPause();
 void escreveTexto(char *texto, int x, int y, SDL_Color cor);
 void exibeFichas(int fichas);
 void exibePontos(int pontos);

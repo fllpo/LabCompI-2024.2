@@ -17,17 +17,15 @@ int main(int argc, char *args[])
     printf("Para fins de teste:\nEspaco: pula e +100 pontos\nC: -1 vida\n");
     if (iniciaJanela())
     {
+        telaApresentacao();
         telaInicial();
         while (quadrado.fichas > 0)
         {
             iniciaJogador(&quadrado);
             while (quadrado.vida > 0)
             {
-                frameStart = SDL_GetTicks();
-                processaEventos(&e);
-                renderiza();
+                telaJogo();
             }
-
             telaFinal();
         }
     }

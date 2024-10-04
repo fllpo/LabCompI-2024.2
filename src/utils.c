@@ -86,10 +86,7 @@ void processaEventos(SDL_Event *e)
             switch (e->key.keysym.sym)
             {
             case SDLK_ESCAPE:
-                destroi(janela);
-                exit(0);
-            case SDLK_m:
-                // menu();
+                telaPause();
                 break;
             case SDLK_c:
                 quadrado.vida--;
@@ -108,7 +105,6 @@ void processaEventos(SDL_Event *e)
                     alturaInicial = quadrado.y;
                 }
                 quadrado.pontos = quadrado.pontos + 100;
-
                 break;
             }
         }
@@ -207,12 +203,9 @@ void telaRecordes()
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_ESCAPE:
-                    destroi(janela);
-                    exit(0);
-                case SDLK_RETURN:
                     menu = 0;
                     break;
-                case SDLK_r:
+                case SDLK_RETURN:
                     menu = 0;
                     break;
                 }
@@ -223,8 +216,35 @@ void telaRecordes()
     }
     fclose(arquivo);
 }
-void telaMenu()
+void telaPause()
 {
+    int pause = 1;
+    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
+    SDL_RenderPresent(renderizador);
+    while (pause)
+    {
+
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                destroi(janela);
+                exit(0);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    pause = 0;
+                    break;
+                case SDLK_p:
+                    pause = 0;
+                    break;
+                }
+            }
+        }
+    }
 }
 void telaFinal()
 {
@@ -274,30 +294,14 @@ void telaFinal()
         gravarRecordes("FEL", quadrado.recorde);
     }
 }
-
-void telaInicial()
+void telaApresentacao()
 {
+    SDL_Texture *img = IMG_LoadTexture(renderizador, "assets/img/rural_logo.png");
+    SDL_Rect r = {TELA_LARGURA / 2 - 150, TELA_ALTURA / 2 - 150, 300, 300};
 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 255; i++)
     {
         SDL_RenderClear(renderizador);
-        SDL_SetRenderDrawColor(renderizador, 0, 0, i, 255);
-        SDL_RenderPresent(renderizador);
-    }
-
-    int inicial = 1;
-    quadrado.fichas = 3;
-
-    while (inicial)
-    {
-        SDL_RenderClear(renderizador);
-
-        escreveTexto("Por Andre, Fellipe e Guilherme.", 100, 100, BRANCO);
-        escreveTexto("Pressione Enter para iniciar jogo", 200, 200, BRANCO);
-        escreveTexto("Pressione R para recordes", 200, 300, BRANCO);
-        exibeFichas(quadrado.fichas);
-
-        escreveTexto("Use A,D e espaco para se movimentar", 200, 500, BRANCO);
 
         while (SDL_PollEvent(&e))
         {
@@ -313,11 +317,91 @@ void telaInicial()
                 case SDLK_ESCAPE:
                     destroi(janela);
                     exit(0);
-                case SDLK_r:
-                    telaRecordes();
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderizador, i, i, i, 255);
+        SDL_RenderCopy(renderizador, img, NULL, &r);
+        escreveTexto("Por Andre, Fellipe e Guilherme.", 100, TELA_ALTURA - 100, PRETO);
+        SDL_Delay(10);
+        SDL_RenderPresent(renderizador);
+    }
+    SDL_Delay(1000);
+    SDL_DestroyTexture(img);
+}
+
+void telaJogo()
+{
+    frameStart = SDL_GetTicks();
+    processaEventos(&e);
+    renderiza();
+}
+void telaInicial()
+{
+
+    int inicial = 1, selecao = 0;
+    quadrado.fichas = 3;
+
+    while (inicial)
+    {
+        SDL_RenderClear(renderizador);
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 200, 255);
+
+        escreveTexto("Iniciar", 200, 200, PRETO);
+        escreveTexto("Instrucoes", 200, 250, PRETO);
+        escreveTexto("Recordes", 200, 300, PRETO);
+
+        exibeFichas(quadrado.fichas);
+
+        switch (selecao)
+        {
+        case 0:
+            escreveTexto("Iniciar", 200, 200, BRANCO);
+            break;
+        case 1:
+            escreveTexto("Instrucoes", 200, 250, BRANCO);
+            break;
+        case 2:
+            escreveTexto("Recordes", 200, 300, BRANCO);
+            break;
+        }
+
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                destroi(janela);
+                exit(0);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    destroi(janela);
+                    exit(0);
+                case SDLK_UP:
+                    if (selecao > 0)
+                        selecao--;
+                    break;
+                case SDLK_DOWN:
+                    if (selecao < 2)
+                        selecao++;
                     break;
                 case SDLK_RETURN:
-                    inicial = 0;
+                    switch (selecao)
+                    {
+                    case 0:
+                        inicial = 0;
+                        break;
+                    case 1:
+                        // instrucoes();
+                        break;
+                    case 2:
+                        telaRecordes();
+                        break;
+                    }
                     break;
                 }
             }
