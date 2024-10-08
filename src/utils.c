@@ -1,5 +1,7 @@
-#include "utils.h"
-#include "jogador.h"
+#include "../include/utils.h"
+#include "../include/jogador.h"
+
+#include "../include/telas.h"
 
 int iniciaJanela(void)
 {
@@ -57,22 +59,20 @@ void destroi(SDL_Window *janela)
 
 void renderiza()
 {
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-    SDL_RenderClear(renderizador);
+    frameStart = SDL_GetTicks();
 
-    renderizaJogador(&quadrado);
-    exibeVida(quadrado.vida);
-    exibePontos(quadrado.pontos);
+    renderizaJogador(&raposa);
+    exibeVida(raposa.vida);
+    exibePontos(raposa.pontos);
 
     frameTime = SDL_GetTicks() - frameStart;
     if (frameTime < FRAME_TIME)
     {
         SDL_Delay(FRAME_TIME - frameTime);
     }
-    SDL_RenderPresent(renderizador);
 }
 
-void processaEventos(SDL_Event *e)
+void processaEventosJogo(SDL_Event *e)
 {
     while (SDL_PollEvent(e))
     {
@@ -89,22 +89,22 @@ void processaEventos(SDL_Event *e)
                 telaPause();
                 break;
             case SDLK_c:
-                quadrado.vida--;
+                raposa.vida--;
                 break;
             case SDLK_d:
-                quadrado.movDireita = true;
+                raposa.movDireita = true;
                 break;
             case SDLK_a:
-                quadrado.movEsquerda = true;
+                raposa.movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!quadrado.pulando)
+                if (!raposa.pulando)
                 {
-                    quadrado.pulando = true;
+                    raposa.pulando = true;
                     velocidadeY = FORCA_SALTO;
-                    alturaInicial = quadrado.y;
+                    alturaInicial = raposa.y;
                 }
-                quadrado.pontos = quadrado.pontos + 100;
+                raposa.pontos = raposa.pontos + 100;
                 break;
             }
         }
@@ -113,10 +113,10 @@ void processaEventos(SDL_Event *e)
             switch (e->key.keysym.sym)
             {
             case SDLK_d:
-                quadrado.movDireita = false;
+                raposa.movDireita = false;
                 break;
             case SDLK_a:
-                quadrado.movEsquerda = false;
+                raposa.movEsquerda = false;
                 break;
             }
         }
@@ -130,7 +130,7 @@ void exibeFichas(int fichas)
 }
 void exibePontos(int pontos)
 {
-    char texto[50];
+    char texto[30];
     sprintf(texto, "Pontos:%d", pontos);
     escreveTexto(texto, TELA_LARGURA - 200, 10, BRANCO);
 }
@@ -148,13 +148,14 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_FreeSurface(textoSuperficie);
     SDL_QueryTexture(textoTextura, NULL, NULL, &textoPosicao.w, &textoPosicao.h);
     SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
+    SDL_DestroyTexture(textoTextura);
 }
 
 void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO: Ordenação de recordes; Receber nomes dinamicamente
 {
     char registro[10];
     sprintf(registro, "%s %d\n", nomeJogador, maiorPonto);
-    FILE *arquivo = fopen("src/bin/score.bin", "ab");
+    FILE *arquivo = fopen("bin/score.bin", "ab");
     if (arquivo != NULL)
     {
         fwrite(registro, sizeof(registro), 1, arquivo);
@@ -162,250 +163,4 @@ void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO: Ordenação de r
     }
     else
         perror("Erro ao abrir arquivo score.bin");
-}
-
-void telaRecordes()
-{
-
-    FILE *arquivo = fopen("src/bin/score.bin", "rb");
-    char score[10];
-
-    int menu = 1;
-
-    while (menu)
-    {
-        SDL_RenderClear(renderizador);
-        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        escreveTexto("Recorde", TELA_LARGURA / 2 - 50, 50, BRANCO);
-
-        if (arquivo != NULL)
-        {
-            fseek(arquivo, 0, SEEK_SET);
-            for (int i = 0; i < 15; i++)
-            {
-                fread(&score, sizeof(score), 1, arquivo);
-
-                escreveTexto(score, TELA_LARGURA / 2 - 50, 100 + (i * 30), BRANCO);
-            }
-        }
-        else
-            perror("Erro ao abrir arquivo score.bin");
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    menu = 0;
-                    break;
-                case SDLK_RETURN:
-                    menu = 0;
-                    break;
-                }
-            }
-        }
-
-        SDL_RenderPresent(renderizador);
-    }
-    fclose(arquivo);
-}
-void telaPause()
-{
-    int pause = 1;
-    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
-    SDL_RenderPresent(renderizador);
-    while (pause)
-    {
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    pause = 0;
-                    break;
-                case SDLK_p:
-                    pause = 0;
-                    break;
-                }
-            }
-        }
-    }
-}
-void telaFinal()
-{
-    quadrado.fichas--;
-    int final = 1;
-    while (final)
-    {
-        SDL_RenderClear(renderizador);
-        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (quadrado.fichas == 0)
-        {
-            escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            telaRecordes();
-        }
-
-        else
-        {
-            escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
-            exibeFichas(quadrado.fichas);
-        }
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    destroi(janela);
-                    exit(0);
-                case SDLK_RETURN:
-                    final = 0;
-                    break;
-                }
-            }
-        }
-        SDL_RenderPresent(renderizador);
-    }
-    if (quadrado.recorde < quadrado.pontos)
-    {
-        quadrado.recorde = quadrado.pontos;
-        gravarRecordes("FEL", quadrado.recorde);
-    }
-}
-void telaApresentacao()
-{
-    SDL_Texture *img = IMG_LoadTexture(renderizador, "assets/img/rural_logo.png");
-    SDL_Rect r = {TELA_LARGURA / 2 - 150, TELA_ALTURA / 2 - 150, 300, 300};
-
-    for (int i = 0; i < 255; i++)
-    {
-        SDL_RenderClear(renderizador);
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    destroi(janela);
-                    exit(0);
-                }
-            }
-        }
-
-        SDL_SetRenderDrawColor(renderizador, i, i, i, 255);
-        SDL_RenderCopy(renderizador, img, NULL, &r);
-        escreveTexto("Por Andre, Fellipe e Guilherme.", 100, TELA_ALTURA - 100, PRETO);
-        SDL_Delay(10);
-        SDL_RenderPresent(renderizador);
-    }
-    SDL_Delay(1000);
-    SDL_DestroyTexture(img);
-}
-
-void telaJogo()
-{
-    frameStart = SDL_GetTicks();
-    processaEventos(&e);
-    renderiza();
-}
-void telaInicial()
-{
-
-    int inicial = 1, selecao = 0;
-    quadrado.fichas = 3;
-
-    while (inicial)
-    {
-        SDL_RenderClear(renderizador);
-        SDL_SetRenderDrawColor(renderizador, 0, 0, 200, 255);
-
-        escreveTexto("Iniciar", 200, 200, PRETO);
-        escreveTexto("Instrucoes", 200, 250, PRETO);
-        escreveTexto("Recordes", 200, 300, PRETO);
-
-        exibeFichas(quadrado.fichas);
-
-        switch (selecao)
-        {
-        case 0:
-            escreveTexto("Iniciar", 200, 200, BRANCO);
-            break;
-        case 1:
-            escreveTexto("Instrucoes", 200, 250, BRANCO);
-            break;
-        case 2:
-            escreveTexto("Recordes", 200, 300, BRANCO);
-            break;
-        }
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    destroi(janela);
-                    exit(0);
-                case SDLK_UP:
-                    if (selecao > 0)
-                        selecao--;
-                    break;
-                case SDLK_DOWN:
-                    if (selecao < 2)
-                        selecao++;
-                    break;
-                case SDLK_RETURN:
-                    switch (selecao)
-                    {
-                    case 0:
-                        inicial = 0;
-                        break;
-                    case 1:
-                        // instrucoes();
-                        break;
-                    case 2:
-                        telaRecordes();
-                        break;
-                    }
-                    break;
-                }
-            }
-        }
-        SDL_RenderPresent(renderizador);
-    }
 }

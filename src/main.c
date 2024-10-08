@@ -1,5 +1,6 @@
 #include "utils.c"
 #include "jogador.c"
+#include "telas.c"
 
 void iniciaJogador(Player *quadrado)
 {
@@ -12,6 +13,7 @@ void iniciaJogador(Player *quadrado)
     quadrado->x = TELA_LARGURA / 2 - quadrado->w;
     quadrado->y = TELA_ALTURA / 2 - quadrado->h;
 }
+
 int main(int argc, char *args[])
 {
     printf("Para fins de teste:\nEspaco: pula e +100 pontos\nC: -1 vida\n");
@@ -19,10 +21,10 @@ int main(int argc, char *args[])
     {
         telaApresentacao();
         telaInicial();
-        while (quadrado.fichas > 0)
+        while (raposa.fichas > 0)
         {
-            iniciaJogador(&quadrado);
-            while (quadrado.vida > 0)
+            iniciaJogador(&raposa);
+            while (raposa.vida > 0)
             {
                 telaJogo();
             }
