@@ -4,6 +4,7 @@
 
 void telaJogo()
 {
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
     processaEventosJogo(&e);
     renderiza();
 }
@@ -23,7 +24,7 @@ void telaRecordes() // OK
         if (arquivo != NULL)
         {
             fseek(arquivo, 0, SEEK_SET);
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 10; i++)
             {
                 fread(&score, sizeof(score), 1, arquivo);
 
@@ -79,9 +80,6 @@ void telaPause() // OK
                 case SDLK_ESCAPE:
                     pause = 0;
                     break;
-                case SDLK_p:
-                    pause = 0;
-                    break;
                 }
             }
         }
@@ -98,32 +96,56 @@ void telaFinal() // TODO
         if (raposa.fichas == 0)
         {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            telaRecordes();
+            exibeFichas(raposa.fichas);
+            while (SDL_PollEvent(&e))
+            {
+                if (e.type == SDL_QUIT)
+                {
+                    destroi(janela);
+                    exit(0);
+                }
+                else if (e.type == SDL_KEYDOWN)
+                {
+                    switch (e.key.keysym.sym)
+                    {
+                    case SDLK_ESCAPE:
+                        destroi(janela);
+                        exit(0);
+                    case SDLK_f:
+                        raposa.fichas += 3;
+                        exibeFichas(raposa.fichas);
+                        SDL_Delay(500);
+                        break;
+                    case SDLK_RETURN:
+                        final = 0;
+                        break;
+                    }
+                }
+            }
         }
 
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
             exibeFichas(raposa.fichas);
-        }
-
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
+            while (SDL_PollEvent(&e))
             {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
+                if (e.type == SDL_QUIT)
                 {
-                case SDLK_ESCAPE:
                     destroi(janela);
                     exit(0);
-                case SDLK_RETURN:
-                    final = 0;
-                    break;
+                }
+                else if (e.type == SDL_KEYDOWN)
+                {
+                    switch (e.key.keysym.sym)
+                    {
+                    case SDLK_ESCAPE:
+                        destroi(janela);
+                        exit(0);
+                    case SDLK_RETURN:
+                        final = 0;
+                        break;
+                    }
                 }
             }
         }
@@ -137,8 +159,8 @@ void telaFinal() // TODO
 }
 void telaApresentacao() // OK
 {
-    SDL_Texture *img = IMG_LoadTexture(renderizador, "assets/img/rural_logo.png");
-    SDL_SetTextureAlphaMod(img, 0);
+    SDL_Texture *logo_rural = IMG_LoadTexture(renderizador, "assets/img/rural_logo.png");
+    SDL_SetTextureAlphaMod(logo_rural, 0);
     SDL_Rect r = {TELA_LARGURA / 2 - 150, TELA_ALTURA / 2 - 150, 300, 300};
 
     for (int i = 0; i < 255; i++)
@@ -164,17 +186,17 @@ void telaApresentacao() // OK
         }
         if (i > 127 && i <= 255)
         {
-            SDL_SetTextureAlphaMod(img, i * 2);
+            SDL_SetTextureAlphaMod(logo_rural, i * 2);
         }
 
         SDL_SetRenderDrawColor(renderizador, i, i, i, 255);
-        SDL_RenderCopy(renderizador, img, NULL, &r);
+        SDL_RenderCopy(renderizador, logo_rural, NULL, &r);
         SDL_Delay(10);
         SDL_RenderPresent(renderizador);
     }
 
     SDL_Delay(1000);
-    SDL_DestroyTexture(img);
+    SDL_DestroyTexture(logo_rural);
 }
 void telaInstrucoes() // TODO
 {
@@ -222,14 +244,12 @@ void telaInicial() // OK
 
     while (inicial)
     {
-        SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 200, 255);
-
+        SDL_RenderClear(renderizador);
         escreveTexto("Iniciar", 200, 200, PRETO);
         escreveTexto("Instrucoes", 200, 250, PRETO);
         escreveTexto("Recordes", 200, 300, PRETO);
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
-
         exibeFichas(raposa.fichas);
 
         switch (selecao)
@@ -260,10 +280,12 @@ void telaInicial() // OK
                     destroi(janela);
                     exit(0);
                 case SDLK_UP:
+
                     if (selecao > 0)
                         selecao--;
                     break;
                 case SDLK_DOWN:
+
                     if (selecao < 2)
                         selecao++;
                     break;

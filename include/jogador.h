@@ -6,7 +6,7 @@ typedef struct Player
 {
     float x, y, h, w;
     int vida, pontos, fichas, recorde;
-    bool movDireita, movEsquerda, pulando;
+    bool movDireita, movEsquerda, pulando, direcao;
 
 } Player;
 

@@ -8,6 +8,7 @@ void iniciaJogador(Player *quadrado)
     quadrado->pontos = 0;
     quadrado->recorde = 0;
     quadrado->movDireita = false;
+    quadrado->direcao = 0;
     quadrado->movEsquerda = false;
     quadrado->pulando = true;
     quadrado->x = TELA_LARGURA / 2 - quadrado->w;
@@ -16,8 +17,9 @@ void iniciaJogador(Player *quadrado)
 
 int main(int argc, char *args[])
 {
-    printf("Para fins de teste:\nEspaco: pula e +100 pontos\nC: -1 vida\n");
-    if (iniciaJanela())
+    printf("\nPara fins de teste:\n\nEspaco: +100 pontos\nC: -1 vida\nF: +3fichas\n");
+
+    if (iniciaJanela() && carregaMidia())
     {
         telaApresentacao();
         telaInicial();

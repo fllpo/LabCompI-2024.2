@@ -10,11 +10,11 @@
 #include <string.h>
 
 #define FPS 30
-#define FRAME_TIME (1000 / FPS)
+#define FRAME_DELAY (1000 / FPS)
 #define VELOCIDADE 1000
 #define TELA_LARGURA 800
 #define TELA_ALTURA 600
-#define VELOCIDADE_MOVIMENTO 20
+#define VELOCIDADE_MOVIMENTO 100
 #define GRAVIDADE 3
 #define FORCA_SALTO -25
 
