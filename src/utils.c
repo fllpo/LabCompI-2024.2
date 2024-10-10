@@ -103,13 +103,13 @@ void processaEventosJogo(SDL_Event *e)
                 jogador.movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!jogador.pulando)
+                if (!jogador.pulando && jogador.nochao)
                 {
                     jogador.pulando = true;
                     jogador.nochao = false;
                     jogador.velocidadeY = jogador.forca_salto;
+                    jogador.pontos += 5; // Reduzimos ainda mais os pontos ganhos por pulo
                 }
-                jogador.pontos = jogador.pontos + 100;
                 break;
             }
         }

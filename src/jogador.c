@@ -1,189 +1,90 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
 
+#define FORCA_SALTO -5.0f // Reduzimos a força do salto
+// Removemos a definição de FPS daqui, pois já está definida em utils.h
+#define FRAME_DELAY (1000 / FPS)
+
 void moveJogador(SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
 {
     SDL_Rect rectPlayer = {jogador.x, jogador.y, jogador.w, jogador.h};
+    Uint32 frameStart = SDL_GetTicks();
 
+    // Movimento horizontal
     if (jogador.movDireita)
     {
-        jogador.x += jogador.velocidade_movimento;
-        for (int i = 0; i < 6; i++)
-        {
-            frameStart = SDL_GetTicks();
-            deltaTime = (frameStart - lastFrame) / 1000;
-            lastFrame = frameStart;
-            SDL_RenderClear(renderizador);
-            SDL_RenderCopy(renderizador, run[i], NULL, &rectPlayer);
-            frameTime = SDL_GetTicks() - frameStart;
-            if (FRAME_DELAY > frameTime)
-            {
-                SDL_Delay(FRAME_DELAY - frameTime);
-            }
-            SDL_RenderPresent(renderizador);
-        }
+        jogador.x += jogador.velocidade_movimento * deltaTime;
         jogador.direcao = 0;
     }
     if (jogador.movEsquerda)
     {
-        jogador.x -= jogador.velocidade_movimento;
-        for (int i = 0; i < 6; i++)
-        {
-            frameStart = SDL_GetTicks();
-            SDL_RenderClear(renderizador);
-            SDL_RenderCopyEx(renderizador, run[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-            frameTime = SDL_GetTicks() - frameStart;
-            if (FRAME_DELAY > frameTime)
-            {
-                SDL_Delay(FRAME_DELAY - frameTime);
-            }
-            SDL_RenderPresent(renderizador);
-        }
+        jogador.x -= jogador.velocidade_movimento * deltaTime;
         jogador.direcao = 1;
     }
 
-    if (jogador.pulando)
+    // Pulo e queda
+    if (jogador.pulando || !jogador.nochao)
     {
         jogador.y += jogador.velocidadeY;
         jogador.velocidadeY += GRAVIDADE;
 
-        if (jogador.velocidadeY > 0)
-        {
-
-            if (jogador.movEsquerda)
-            {
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopyEx(renderizador, jump[1], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-                frameTime = SDL_GetTicks() - frameStart;
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-            }
-            else if (jogador.movDireita)
-            {
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopy(renderizador, jump[1], NULL, &rectPlayer);
-                frameTime = SDL_GetTicks() - frameStart;
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-            }
-        }
-        if (jogador.velocidadeY <= 0)
-        {
-            if (jogador.movEsquerda || jogador.direcao == 1)
-            {
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopyEx(renderizador, jump[0], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-
-                frameTime = SDL_GetTicks() - frameStart;
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-
-                SDL_RenderPresent(renderizador);
-            }
-            if (jogador.movDireita || jogador.direcao == 0)
-            {
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopy(renderizador, jump[0], NULL, &rectPlayer);
-                frameTime = SDL_GetTicks() - frameStart;
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-            }
-        }
-
         if (jogador.y >= TELA_ALTURA - jogador.h - 100) // Tratamento de colisão (chão)
         {
-            jogador.y = TELA_ALTURA - jogador.h;
+            jogador.y = TELA_ALTURA - jogador.h - 100;
             jogador.pulando = false;
             jogador.nochao = true;
+            jogador.velocidadeY = 0;
         }
     }
-    if (!jogador.movDireita && !jogador.movEsquerda && !jogador.pulando)
+
+    // Renderização
+    SDL_RenderClear(renderizador);
+
+    SDL_Texture* currentTexture;
+    if (jogador.pulando || !jogador.nochao)
     {
-        int i = 0;
+        currentTexture = (jogador.velocidadeY > 0) ? jump[1] : jump[0];
+    }
+    else if (jogador.movDireita || jogador.movEsquerda)
+    {
+        currentTexture = run[SDL_GetTicks() / 150 % 6]; // Animação de corrida mais lenta
+    }
+    else
+    {
+        currentTexture = idle[SDL_GetTicks() / 300 % 4]; // Animação parado mais lenta
+    }
 
-        if (jogador.direcao == 0)
-        {
-            while (i < 4)
-            {
-                frameStart = SDL_GetTicks();
+    rectPlayer.x = jogador.x;
+    rectPlayer.y = jogador.y;
 
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopy(renderizador, idle[i], NULL, &rectPlayer);
+    if (jogador.direcao == 1)
+    {
+        SDL_RenderCopyEx(renderizador, currentTexture, NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+    }
+    else
+    {
+        SDL_RenderCopy(renderizador, currentTexture, NULL, &rectPlayer);
+    }
 
-                frameTime = SDL_GetTicks() - frameStart;
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-                i++;
-            }
-            while (i > 0)
-            {
-                i--;
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopy(renderizador, idle[i], NULL, &rectPlayer);
-                frameTime = SDL_GetTicks() - frameStart;
+    SDL_RenderPresent(renderizador);
 
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-            }
-        }
-        if (jogador.direcao == 1)
-        {
-            while (i < 4)
-            {
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopyEx(renderizador, idle[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-
-                frameTime = SDL_GetTicks() - frameStart;
-
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-                i++;
-            }
-            while (i > 0)
-            {
-                i--;
-                frameStart = SDL_GetTicks();
-                SDL_RenderClear(renderizador);
-                SDL_RenderCopyEx(renderizador, idle[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-                frameTime = SDL_GetTicks() - frameStart;
-
-                if (FRAME_DELAY > frameTime)
-                {
-                    SDL_Delay(FRAME_DELAY - frameTime);
-                }
-                SDL_RenderPresent(renderizador);
-            }
-        }
+    // Controle de FPS
+    Uint32 frameTime = SDL_GetTicks() - frameStart;
+    if (frameTime < FRAME_DELAY)
+    {
+        SDL_Delay(FRAME_DELAY - frameTime);
     }
 }
 
 void renderizaJogador(Player *jogador)
 {
     moveJogador(idle, run, jump);
+}
+    
+void inicializaJogador(Player *jogador)
+{
+    // ... outras inicializações ...
+    jogador->velocidade_movimento = 100; // Alterado para int
+    jogador->forca_salto = FORCA_SALTO;
+    // ... resto do código ...
 }

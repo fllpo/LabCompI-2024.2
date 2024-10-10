@@ -16,8 +16,8 @@ bool iniciaJogador(Player *jogador, int selecao)
         jogador->x = TELA_LARGURA / 2 - jogador->w;
         jogador->y = TELA_ALTURA / 2 - jogador->h;
         jogador->velocidadeY = 0;
-        jogador->velocidade_movimento = 50;
-        jogador->forca_salto = -100;
+        jogador->velocidade_movimento = 250;
+        jogador->forca_salto = -80;
 
         idle[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
         idle[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-2.png");
@@ -63,7 +63,17 @@ int main(int argc, char *args[])
             {
                 while (jogador.vida > 0)
                 {
+                    Uint32 frameStart = SDL_GetTicks();
+                    deltaTime = (frameStart - lastFrame) / 1000.0f;
+                    lastFrame = frameStart;
+
                     telaJogo();
+
+                    Uint32 frameTime = SDL_GetTicks() - frameStart;
+                    if (frameTime < FRAME_DELAY)
+                    {
+                        SDL_Delay(FRAME_DELAY - frameTime);
+                    }
                 }
                 telaFinal();
             }

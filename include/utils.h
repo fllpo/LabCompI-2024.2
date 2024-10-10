@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define FPS 15
+#define FPS 60 // Alterado de 15 para 60
 #define FRAME_DELAY (1000 / FPS)
 #define VELOCIDADE 1000
 #define TELA_LARGURA 800
