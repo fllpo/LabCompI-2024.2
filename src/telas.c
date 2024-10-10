@@ -4,9 +4,17 @@
 
 void telaJogo()
 {
+
     SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+
     processaEventosJogo(&e);
+
     renderiza();
+}
+
+int telaSelecaoPersonagem() // TODO
+{
+    return 1; // raposa
 }
 
 void telaRecordes() // OK
@@ -87,16 +95,16 @@ void telaPause() // OK
 }
 void telaFinal() // TODO
 {
-    raposa.fichas--;
+    jogador.fichas--;
     int final = 1;
     while (final)
     {
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (raposa.fichas == 0)
+        if (jogador.fichas == 0)
         {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            exibeFichas(raposa.fichas);
+            exibeFichas(jogador.fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -112,8 +120,8 @@ void telaFinal() // TODO
                         destroi(janela);
                         exit(0);
                     case SDLK_f:
-                        raposa.fichas += 3;
-                        exibeFichas(raposa.fichas);
+                        jogador.fichas += 3;
+                        exibeFichas(jogador.fichas);
                         SDL_Delay(500);
                         break;
                     case SDLK_RETURN:
@@ -127,7 +135,7 @@ void telaFinal() // TODO
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
-            exibeFichas(raposa.fichas);
+            exibeFichas(jogador.fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -151,10 +159,10 @@ void telaFinal() // TODO
         }
         SDL_RenderPresent(renderizador);
     }
-    if (raposa.recorde < raposa.pontos)
+    if (jogador.recorde < jogador.pontos)
     {
-        raposa.recorde = raposa.pontos;
-        gravarRecordes("FEL", raposa.recorde);
+        jogador.recorde = jogador.pontos;
+        gravarRecordes("FEL", jogador.recorde);
     }
 }
 void telaApresentacao() // OK
@@ -240,7 +248,7 @@ void telaInicial() // OK
 {
 
     int inicial = 1, selecao = 0;
-    raposa.fichas = 3;
+    jogador.fichas = 3;
 
     while (inicial)
     {
@@ -250,7 +258,7 @@ void telaInicial() // OK
         escreveTexto("Instrucoes", 200, 250, PRETO);
         escreveTexto("Recordes", 200, 300, PRETO);
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
-        exibeFichas(raposa.fichas);
+        exibeFichas(jogador.fichas);
 
         switch (selecao)
         {

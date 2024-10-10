@@ -3,124 +3,187 @@
 
 void moveJogador(SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
 {
-    SDL_Rect rectPlayer = {raposa.x, raposa.y, raposa.w, raposa.h};
+    SDL_Rect rectPlayer = {jogador.x, jogador.y, jogador.w, jogador.h};
 
-    if (raposa.movDireita)
+    if (jogador.movDireita)
     {
-        raposa.x += VELOCIDADE_MOVIMENTO;
+        jogador.x += jogador.velocidade_movimento;
         for (int i = 0; i < 6; i++)
         {
+            frameStart = SDL_GetTicks();
+            deltaTime = (frameStart - lastFrame) / 1000;
+            lastFrame = frameStart;
             SDL_RenderClear(renderizador);
             SDL_RenderCopy(renderizador, run[i], NULL, &rectPlayer);
+            frameTime = SDL_GetTicks() - frameStart;
+            if (FRAME_DELAY > frameTime)
+            {
+                SDL_Delay(FRAME_DELAY - frameTime);
+            }
             SDL_RenderPresent(renderizador);
         }
-        raposa.direcao = 0;
+        jogador.direcao = 0;
     }
-    if (raposa.movEsquerda)
+    if (jogador.movEsquerda)
     {
+        jogador.x -= jogador.velocidade_movimento;
         for (int i = 0; i < 6; i++)
         {
+            frameStart = SDL_GetTicks();
             SDL_RenderClear(renderizador);
             SDL_RenderCopyEx(renderizador, run[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+            frameTime = SDL_GetTicks() - frameStart;
+            if (FRAME_DELAY > frameTime)
+            {
+                SDL_Delay(FRAME_DELAY - frameTime);
+            }
             SDL_RenderPresent(renderizador);
         }
-        raposa.x -= VELOCIDADE_MOVIMENTO;
-        raposa.direcao = 1;
+        jogador.direcao = 1;
     }
 
-    if (raposa.pulando)
+    if (jogador.pulando)
     {
-        velocidadeY += GRAVIDADE;
-        raposa.y += velocidadeY;
+        jogador.y += jogador.velocidadeY;
+        jogador.velocidadeY += GRAVIDADE;
 
-        if (velocidadeY > 0)
+        if (jogador.velocidadeY > 0)
         {
-            if (raposa.movEsquerda && raposa.pulando)
+
+            if (jogador.movEsquerda)
             {
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopyEx(renderizador, jump[1], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+                frameTime = SDL_GetTicks() - frameStart;
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
             }
-            else if (raposa.pulando)
+            else if (jogador.movDireita)
             {
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopy(renderizador, jump[1], NULL, &rectPlayer);
+                frameTime = SDL_GetTicks() - frameStart;
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
             }
         }
-        if (velocidadeY < 0)
+        if (jogador.velocidadeY <= 0)
         {
-
-            if ((raposa.movEsquerda && raposa.pulando) || (raposa.direcao == 1 && raposa.pulando))
+            if (jogador.movEsquerda || jogador.direcao == 1)
             {
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopyEx(renderizador, jump[0], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                frameTime = SDL_GetTicks() - frameStart;
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
+
                 SDL_RenderPresent(renderizador);
             }
-            else if (raposa.direcao == 0 && raposa.pulando)
+            if (jogador.movDireita || jogador.direcao == 0)
             {
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopy(renderizador, jump[0], NULL, &rectPlayer);
+                frameTime = SDL_GetTicks() - frameStart;
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
             }
         }
 
-        if (raposa.y >= TELA_ALTURA - raposa.h - 100)
+        if (jogador.y >= TELA_ALTURA - jogador.h - 100) // Tratamento de colisão (chão)
         {
-            raposa.y = TELA_ALTURA - raposa.h;
-            raposa.pulando = false;
+            jogador.y = TELA_ALTURA - jogador.h;
+            jogador.pulando = false;
+            jogador.nochao = true;
         }
     }
-    if (!raposa.movDireita && !raposa.movEsquerda && !raposa.pulando)
+    if (!jogador.movDireita && !jogador.movEsquerda && !jogador.pulando)
     {
         int i = 0;
 
-        if (raposa.direcao == 0)
+        if (jogador.direcao == 0)
         {
             while (i < 4)
             {
+                frameStart = SDL_GetTicks();
+
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopy(renderizador, idle[i], NULL, &rectPlayer);
+
+                frameTime = SDL_GetTicks() - frameStart;
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
                 i++;
             }
             while (i > 0)
             {
                 i--;
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopy(renderizador, idle[i], NULL, &rectPlayer);
+                frameTime = SDL_GetTicks() - frameStart;
+
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
             }
         }
-        if (raposa.direcao == 1)
+        if (jogador.direcao == 1)
         {
             while (i < 4)
             {
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopyEx(renderizador, idle[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                frameTime = SDL_GetTicks() - frameStart;
+
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
                 i++;
             }
             while (i > 0)
             {
                 i--;
+                frameStart = SDL_GetTicks();
                 SDL_RenderClear(renderizador);
                 SDL_RenderCopyEx(renderizador, idle[i], NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
+                frameTime = SDL_GetTicks() - frameStart;
+
+                if (FRAME_DELAY > frameTime)
+                {
+                    SDL_Delay(FRAME_DELAY - frameTime);
+                }
                 SDL_RenderPresent(renderizador);
             }
         }
     }
 }
 
-void renderizaJogador(Player *raposa)
+void renderizaJogador(Player *jogador)
 {
-    frameStart = SDL_GetTicks();
-
     moveJogador(idle, run, jump);
-
-    frameTime = SDL_GetTicks() - frameStart;
-    if (frameTime < FRAME_DELAY)
-    {
-        SDL_Delay(FRAME_DELAY - frameTime);
-    }
 }

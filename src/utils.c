@@ -34,7 +34,7 @@ int iniciaJanela(void)
         return 0;
     }
 
-    renderizador = SDL_CreateRenderer(janela, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderizador = SDL_CreateRenderer(janela, -1, SDL_RENDERER_ACCELERATED); //| SDL_RENDERER_PRESENTVSYNC
     if (!renderizador)
     {
         printf("Erro ao criar o renderizador: %s\n", SDL_GetError());
@@ -70,42 +70,11 @@ void destroi(SDL_Window *janela)
     exit(0);
 }
 
-bool carregaMidia()
-{
-
-    idle[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
-    idle[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-2.png");
-    idle[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-3.png");
-    idle[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-4.png");
-    run[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-1.png");
-    run[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-2.png");
-    run[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-3.png");
-    run[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-4.png");
-    run[4] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-5.png");
-    run[5] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-6.png");
-    jump[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/jump/player-jump-1.png");
-    jump[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/jump/player-jump-2.png");
-
-    for (int i = 0; i < 6; i++)
-    {
-        if (run[i] == NULL)
-            return 0;
-
-        if (i < 4 && idle[i] == NULL)
-        {
-            return 0;
-            if (i < 2 && idle[i] == NULL)
-                return 0;
-        }
-    }
-    return 1;
-}
-
 void renderiza()
 {
-    renderizaJogador(&raposa);
-    exibeVida(raposa.vida);
-    exibePontos(raposa.pontos);
+    renderizaJogador(&jogador);
+    exibeVida(jogador.vida);
+    exibePontos(jogador.pontos);
 }
 
 void processaEventosJogo(SDL_Event *e)
@@ -125,22 +94,22 @@ void processaEventosJogo(SDL_Event *e)
                 telaPause();
                 break;
             case SDLK_c:
-                raposa.vida--;
+                jogador.vida--;
                 break;
             case SDLK_d:
-                raposa.movDireita = true;
+                jogador.movDireita = true;
                 break;
             case SDLK_a:
-                raposa.movEsquerda = true;
+                jogador.movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!raposa.pulando)
+                if (!jogador.pulando)
                 {
-                    raposa.pulando = true;
-                    velocidadeY = FORCA_SALTO;
-                    alturaInicial = raposa.y;
+                    jogador.pulando = true;
+                    jogador.nochao = false;
+                    jogador.velocidadeY = jogador.forca_salto;
                 }
-                raposa.pontos = raposa.pontos + 100;
+                jogador.pontos = jogador.pontos + 100;
                 break;
             }
         }
@@ -149,10 +118,10 @@ void processaEventosJogo(SDL_Event *e)
             switch (e->key.keysym.sym)
             {
             case SDLK_d:
-                raposa.movDireita = false;
+                jogador.movDireita = false;
                 break;
             case SDLK_a:
-                raposa.movEsquerda = false;
+                jogador.movEsquerda = false;
                 break;
             }
         }

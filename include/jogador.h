@@ -4,21 +4,20 @@
 #include "utils.h"
 typedef struct Player
 {
-    float x, y, h, w;
-    int vida, pontos, fichas, recorde;
-    bool movDireita, movEsquerda, pulando, direcao;
+    float x, y, h, w, velocidadeY;
+    int vida, pontos, fichas, recorde, velocidade_movimento, forca_salto;
+    bool movDireita, movEsquerda, pulando, direcao, nochao;
 
 } Player;
 
-Player raposa = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 150, 150};
+Player jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 150, 150};
 
 SDL_Texture *idle[4];
 SDL_Texture *run[6];
 SDL_Texture *jump[2];
 
-int alturaInicial = 0;
 void moveJogador(SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump);
 void exibeVida(int vida);
-void renderizaJogador(Player *raposa);
+void renderizaJogador(Player *jogador);
 
 #endif
