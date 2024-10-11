@@ -5,7 +5,7 @@
 
 bool iniciaJogador(Player *jogador, int selecao)
 {
-    jogador->vida = 3;
+        jogador->vida = 3;
         jogador->pontos = 0;
         jogador->recorde = 0;
         jogador->movDireita = false;
@@ -93,8 +93,8 @@ int main(int argc, char *args[])
     if (iniciaJanela())
     {
         telaApresentacao();
-        telaInicial();
-        int selecao = telaSelecaoPersonagem();
+        telaInicial(&jogador);
+        int selecao = telaSelecaoPersonagem(&jogador);
         while (jogador.fichas > 0)
         {
             if (iniciaJogador(&jogador, selecao))
@@ -113,7 +113,7 @@ int main(int argc, char *args[])
                         SDL_Delay(FRAME_DELAY - frameTime);
                     }
                 }
-                telaFinal();
+                telaFinal(&jogador);
             }
             else
             {
