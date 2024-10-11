@@ -72,55 +72,99 @@ void moveJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Tex
         SDL_Delay(FRAME_DELAY - frameTime);
     }
 }
+
 bool iniciaJogador(Player *jogador, int selecao)
 {
-    if (selecao == 0) // Personagem raposa
-    {
+    jogador->vida = 3;
+    jogador->pontos = 0;
+    jogador->recorde = 0;
+    jogador->movDireita = false;
+    jogador->direcao = 0;
+    jogador->movEsquerda = false;
+    jogador->pulando = true;
+    jogador->x = TELA_LARGURA / 2 - jogador->w;
+    jogador->y = TELA_ALTURA / 2 - jogador->h;
+    jogador->velocidadeY = 0;
+    const char *personagem;
+    int num_idle, num_run, num_jump;
 
-        jogador->vida = 3;
-        jogador->pontos = 0;
-        jogador->recorde = 0;
-        jogador->movDireita = false;
-        jogador->direcao = 0;
-        jogador->movEsquerda = false;
-        jogador->pulando = true;
-        jogador->x = TELA_LARGURA / 2 - jogador->w;
-        jogador->y = TELA_ALTURA / 2 - jogador->h;
-        jogador->velocidadeY = 0;
+    switch (selecao)
+    {
+    case 0:
+        personagem = "Foxy";
+        num_idle = 4;
+        num_run = 6;
+        num_jump = 2;
+        jogador->velocidade_movimento = 800;
+        jogador->forca_salto = -60;
+        break;
+    case 1:
+        personagem = "Squirrel";
+        num_idle = 8;
+        num_run = 6;
+        num_jump = 4;
         jogador->velocidade_movimento = 1000;
         jogador->forca_salto = -80;
+        break;
+    case 2:
+        personagem = "sunny-bunny";
+        num_idle = 4; // Ajuste esses números conforme necessário
+        num_run = 6;
+        num_jump = 5;
+        jogador->velocidade_movimento = 1000;
+        jogador->forca_salto = -80;
+        break;
+    case 3:
+        personagem = "Fiery Imp";
+        num_idle = 4; // Ajuste esses números conforme necessário
+        num_run = 8;
+        num_jump = 5;
+        jogador->velocidade_movimento = 1000;
+        jogador->forca_salto = -80;
+        break;
+    default:
+        printf("Seleção de personagem inválida.\n");
+        return false;
+    }
 
-        idle[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
-        idle[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-2.png");
-        idle[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-3.png");
-        idle[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-4.png");
-        run[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-1.png");
-        run[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-2.png");
-        run[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-3.png");
-        run[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-4.png");
-        run[4] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-5.png");
-        run[5] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/run/player-run-6.png");
-        jump[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/jump/player-jump-1.png");
-        jump[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/jump/player-jump-2.png");
+    char caminho[256];
 
-        for (int i = 0; i < 6; i++)
+    // Carregando texturas idle
+    for (int i = 0; i < num_idle; i++)
+    {
+        snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/idle/player-idle-%d.png", personagem, i + 1);
+        idle[i] = IMG_LoadTexture(renderizador, caminho);
+        if (idle[i] == NULL)
         {
-            if (run[i] == NULL)
-                return 0;
-
-            if (i < 4 && idle[i] == NULL)
-            {
-                return 0;
-                if (i < 2 && idle[i] == NULL)
-                    return 0;
-            }
+            printf("Erro ao carregar textura idle %d para %s: %s\n", i + 1, personagem, IMG_GetError());
+            return false;
         }
     }
-    if (selecao == 1) // Personagem esquilo
+
+    // Carregando texturas run
+    for (int i = 0; i < num_run; i++)
     {
-        printf("Esquilo nao implementado\n");
-        return 0;
+        snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/run/player-run-%d.png", personagem, i + 1);
+        run[i] = IMG_LoadTexture(renderizador, caminho);
+        if (run[i] == NULL)
+        {
+            printf("Erro ao carregar textura run %d para %s: %s\n", i + 1, personagem, IMG_GetError());
+            return false;
+        }
     }
 
-    return 1;
+    // Carregando texturas jump
+    for (int i = 0; i < num_jump; i++)
+    {
+        snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/jump/player-jump-%d.png", personagem, i + 1);
+        jump[i] = IMG_LoadTexture(renderizador, caminho);
+        if (jump[i] == NULL)
+        {
+            printf("Erro ao carregar textura jump %d para %s: %s\n", i + 1, personagem, IMG_GetError());
+            return false;
+        }
+    }
+
+    printf("Todas as texturas carregadas com sucesso para %s.\n", personagem);
+    return true;
 }

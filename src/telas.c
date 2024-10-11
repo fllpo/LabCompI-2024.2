@@ -3,12 +3,11 @@
 
 void telaJogo()
 {
-
     processaEventosJogo(&jogador, &e);
     renderiza();
 }
 
-int telaSelecaoPersonagem()
+int telaSelecaoPersonagem(Player *jogador)
 {
     int menu = 1, selecao = 0;
     SDL_Texture *personagens[4];
@@ -92,10 +91,11 @@ int telaSelecaoPersonagem()
     }
 
     // Liberar as texturas dos personagens
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         SDL_DestroyTexture(personagens[i]);
     }
-
+    jogador->fichas = 3;
     return selecao;
 }
 void telaRecordes() // OK
@@ -127,8 +127,8 @@ void telaRecordes() // OK
         for (int i = 0; i < numRecordes; i++)
         {
             char textoRecorde[100];
-            snprintf(textoRecorde, sizeof(textoRecorde), "%d. %s - %d", i + 1, recordes[i].nome, recordes[i].pontos);
-            escreveTexto(textoRecorde, 10, 50 + i * ALTURA_LINHA, BRANCO);
+            snprintf(textoRecorde, sizeof(textoRecorde), "%d. %s\t%d", i + 1, recordes[i].nome, recordes[i].pontos);
+            escreveTexto(textoRecorde, TELA_LARGURA / 2 - 60, 50 + i * ALTURA_LINHA, BRANCO);
         }
 
         while (SDL_PollEvent(&e))
@@ -337,7 +337,6 @@ void telaInicial(Player *jogador) // OK
 {
 
     int inicial = 1, selecao = 0;
-    jogador->fichas = 3;
 
     while (inicial)
     {
