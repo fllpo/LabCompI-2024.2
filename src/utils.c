@@ -34,7 +34,7 @@ int iniciaJanela(void)
         return 0;
     }
 
-    renderizador = SDL_CreateRenderer(janela, -1, SDL_RENDERER_ACCELERATED); //| SDL_RENDERER_PRESENTVSYNC
+    renderizador = SDL_CreateRenderer(janela, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderizador)
     {
         printf("Erro ao criar o renderizador: %s\n", SDL_GetError());
@@ -72,10 +72,10 @@ void destroi(SDL_Window *janela)
 
 void renderiza()
 {
-    renderizaJogador(&jogador);
+    moveJogador(&jogador, idle, run, jump);
 }
 
-void processaEventosJogo(SDL_Event *e)
+void processaEventosJogo(Player *jogador, SDL_Event *e)
 {
     while (SDL_PollEvent(e))
     {
@@ -92,21 +92,21 @@ void processaEventosJogo(SDL_Event *e)
                 telaPause();
                 break;
             case SDLK_c:
-                jogador.vida--;
+                jogador->vida--;
                 break;
             case SDLK_d:
-                jogador.movDireita = true;
+                jogador->movDireita = true;
                 break;
             case SDLK_a:
-                jogador.movEsquerda = true;
+                jogador->movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!jogador.pulando && jogador.nochao)
+                if (!jogador->pulando && jogador->nochao)
                 {
-                    jogador.pulando = true;
-                    jogador.nochao = false;
-                    jogador.velocidadeY = jogador.forca_salto;
-                    jogador.pontos += 5; // Reduzimos ainda mais os pontos ganhos por pulo
+                    jogador->pulando = true;
+                    jogador->nochao = false;
+                    jogador->velocidadeY = jogador->forca_salto;
+                    jogador->pontos += 5;
                 }
                 break;
             }
@@ -116,10 +116,10 @@ void processaEventosJogo(SDL_Event *e)
             switch (e->key.keysym.sym)
             {
             case SDLK_d:
-                jogador.movDireita = false;
+                jogador->movDireita = false;
                 break;
             case SDLK_a:
-                jogador.movEsquerda = false;
+                jogador->movEsquerda = false;
                 break;
             }
         }

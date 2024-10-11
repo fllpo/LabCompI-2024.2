@@ -5,13 +5,11 @@
 void telaJogo()
 {
 
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-    processaEventosJogo(&e);
-
+    processaEventosJogo(&jogador, &e);
     renderiza();
 }
 
-int telaSelecaoPersonagem() // TODO
+int telaSelecaoPersonagem(Player *jogador) // TODO
 {
     int menu = 1, selecao = 0;
 
@@ -22,7 +20,7 @@ int telaSelecaoPersonagem() // TODO
         escreveTexto("Raposa", 200, 200, PRETO);
         escreveTexto("Esquilo", 200, 250, PRETO);
 
-        exibeFichas(jogador.fichas);
+        exibeFichas(jogador->fichas);
 
         switch (selecao)
         {
@@ -67,7 +65,6 @@ int telaSelecaoPersonagem() // TODO
     }
     return selecao;
 }
-
 void telaRecordes() // OK
 {
     char score[10];
@@ -144,18 +141,19 @@ void telaPause() // OK
         }
     }
 }
-void telaFinal() // TODO
+void telaFinal(Player *jogador) // TODO
 {
-    jogador.fichas--;
+    jogador->fichas--;
     int final = 1;
     while (final)
     {
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (jogador.fichas == 0)
+        if (jogador->fichas == 0)
         {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            exibeFichas(jogador.fichas);
+            escreveTexto("Pressione F para adicionar mais fichas!", 200, 250, BRANCO);
+            exibeFichas(jogador->fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -171,8 +169,8 @@ void telaFinal() // TODO
                         destroi(janela);
                         exit(0);
                     case SDLK_f:
-                        jogador.fichas += 3;
-                        exibeFichas(jogador.fichas);
+                        jogador->fichas += 3;
+                        exibeFichas(jogador->fichas);
                         SDL_Delay(500);
                         break;
                     case SDLK_RETURN:
@@ -186,7 +184,7 @@ void telaFinal() // TODO
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
-            exibeFichas(jogador.fichas);
+            exibeFichas(jogador->fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -210,10 +208,10 @@ void telaFinal() // TODO
         }
         SDL_RenderPresent(renderizador);
     }
-    if (jogador.recorde < jogador.pontos)
+    if (jogador->recorde < jogador->pontos)
     {
-        jogador.recorde = jogador.pontos;
-        gravarRecordes("FEL", jogador.recorde);
+        jogador->recorde = jogador->pontos;
+        gravarRecordes("FEL", jogador->recorde);
     }
 }
 void telaApresentacao() // OK
@@ -295,11 +293,11 @@ void telaInstrucoes() // TODO
         SDL_RenderPresent(renderizador);
     }
 }
-void telaInicial() // OK
+void telaInicial(Player *jogador) // OK
 {
 
     int inicial = 1, selecao = 0;
-    jogador.fichas = 3;
+    jogador->fichas = 3;
 
     while (inicial)
     {
@@ -309,7 +307,7 @@ void telaInicial() // OK
         escreveTexto("Instrucoes", 200, 250, PRETO);
         escreveTexto("Recordes", 200, 300, PRETO);
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
-        exibeFichas(jogador.fichas);
+        exibeFichas(jogador->fichas);
 
         switch (selecao)
         {

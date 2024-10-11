@@ -1,10 +1,10 @@
 OBJS = main.c
-CC= gcc
+CC = gcc
 OBJ_NAME = main
+LD_FLAGS = -lSDL2 -lSDL2_ttf -lSDL2_image 
 
 all : src/$(OBJS)
 	clear
-	$(CC) src/$(OBJS) -lSDL2 -lSDL2_ttf -lSDL2_image -o bin/$(OBJ_NAME) -Wall
+	$(CC) src/$(OBJS) $(LD_FLAGS) -o bin/$(OBJ_NAME) -Wall
 	./bin/$(OBJ_NAME)
 	rm ./bin/$(OBJ_NAME)
-
