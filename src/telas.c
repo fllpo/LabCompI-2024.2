@@ -1,4 +1,3 @@
-
 #include "../include/utils.h"
 #include "../include/jogador.h"
 
@@ -9,26 +8,56 @@ void telaJogo()
     renderiza();
 }
 
-int telaSelecaoPersonagem(Player *jogador) // TODO
+int telaSelecaoPersonagem()
 {
     int menu = 1, selecao = 0;
+    SDL_Texture *personagens[4];
+    SDL_Rect molduraExterna = {145, 145, 310, 310};
+    SDL_Rect molduraInterna = {150, 150, 300, 300};
+    SDL_Rect imagemRect = {160, 160, 280, 280};
+
+    // Carregando as imagens dos personagens
+    personagens[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
+    personagens[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Squirrel/Sprites/idle/player-idle-1.png");
+    personagens[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/sunny-bunny/Sprites/idle/player-idle-1.png");
+    personagens[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Fiery Imp/Sprites/idle/player-idle-1.png");
 
     while (menu)
     {
         SDL_SetRenderDrawColor(renderizador, 150, 150, 150, 255);
         SDL_RenderClear(renderizador);
-        escreveTexto("Raposa", 200, 200, PRETO);
-        escreveTexto("Esquilo", 200, 250, PRETO);
+
+        // Desenhar a moldura externa (marrom)
+        SDL_SetRenderDrawColor(renderizador, 139, 69, 19, 255); // Cor marrom
+        SDL_RenderFillRect(renderizador, &molduraExterna);
+
+        // Desenhar a moldura interna (fundo da imagem)
+        SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255);
+        SDL_RenderFillRect(renderizador, &molduraInterna);
+
+        // Desenhar a imagem do personagem selecionado
+        SDL_RenderCopy(renderizador, personagens[selecao], NULL, &imagemRect);
+
+        escreveTexto("Raposa", 500, 200, PRETO);
+        escreveTexto("Esquilo", 500, 250, PRETO);
+        escreveTexto("Coelho", 500, 300, PRETO);
+        escreveTexto("Charmander", 500, 350, PRETO);
 
         exibeFichas(jogador->fichas);
 
         switch (selecao)
         {
         case 0:
-            escreveTexto("Raposa", 200, 200, BRANCO);
+            escreveTexto("Raposa", 500, 200, BRANCO);
             break;
         case 1:
-            escreveTexto("Esquilo", 200, 250, BRANCO);
+            escreveTexto("Esquilo", 500, 250, BRANCO);
+            break;
+        case 2:
+            escreveTexto("Coelho", 500, 300, BRANCO);
+            break;
+        case 3:
+            escreveTexto("Charmander", 500, 350, BRANCO);
             break;
         }
         while (SDL_PollEvent(&e))
@@ -46,13 +75,11 @@ int telaSelecaoPersonagem(Player *jogador) // TODO
                     destroi(janela);
                     exit(0);
                 case SDLK_UP:
-
                     if (selecao > 0)
                         selecao--;
                     break;
                 case SDLK_DOWN:
-
-                    if (selecao < 1)
+                    if (selecao < 3)
                         selecao++;
                     break;
                 case SDLK_RETURN:
@@ -63,6 +90,12 @@ int telaSelecaoPersonagem(Player *jogador) // TODO
         }
         SDL_RenderPresent(renderizador);
     }
+
+    // Liberar as texturas dos personagens
+    for (int i = 0; i < 4; i++) {
+        SDL_DestroyTexture(personagens[i]);
+    }
+
     return selecao;
 }
 void telaRecordes() // OK
