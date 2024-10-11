@@ -73,8 +73,6 @@ void destroi(SDL_Window *janela)
 void renderiza()
 {
     renderizaJogador(&jogador);
-    exibeVida(jogador.vida);
-    exibePontos(jogador.pontos);
 }
 
 void processaEventosJogo(SDL_Event *e)

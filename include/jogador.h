@@ -10,7 +10,7 @@ typedef struct Player
 
 } Player;
 
-Player jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 150, 150};
+Player jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
 
 SDL_Texture *idle[4];
 SDL_Texture *run[6];

@@ -6,7 +6,6 @@ void telaJogo()
 {
 
     SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-
     processaEventosJogo(&e);
 
     renderiza();
@@ -14,7 +13,59 @@ void telaJogo()
 
 int telaSelecaoPersonagem() // TODO
 {
-    return 1; // raposa
+    int menu = 1, selecao = 0;
+
+    while (menu)
+    {
+        SDL_SetRenderDrawColor(renderizador, 150, 150, 150, 255);
+        SDL_RenderClear(renderizador);
+        escreveTexto("Raposa", 200, 200, PRETO);
+        escreveTexto("Esquilo", 200, 250, PRETO);
+
+        exibeFichas(jogador.fichas);
+
+        switch (selecao)
+        {
+        case 0:
+            escreveTexto("Raposa", 200, 200, BRANCO);
+            break;
+        case 1:
+            escreveTexto("Esquilo", 200, 250, BRANCO);
+            break;
+        }
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                destroi(janela);
+                exit(0);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    destroi(janela);
+                    exit(0);
+                case SDLK_UP:
+
+                    if (selecao > 0)
+                        selecao--;
+                    break;
+                case SDLK_DOWN:
+
+                    if (selecao < 1)
+                        selecao++;
+                    break;
+                case SDLK_RETURN:
+                    menu = 0;
+                    break;
+                }
+            }
+        }
+        SDL_RenderPresent(renderizador);
+    }
+    return selecao;
 }
 
 void telaRecordes() // OK

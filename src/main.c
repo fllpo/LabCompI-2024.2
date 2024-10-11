@@ -4,8 +4,9 @@
 
 bool iniciaJogador(Player *jogador, int selecao)
 {
-    if (selecao == 1) // Personagem raposa
+    if (selecao == 0) // Personagem raposa
     {
+
         jogador->vida = 3;
         jogador->pontos = 0;
         jogador->recorde = 0;
@@ -16,7 +17,7 @@ bool iniciaJogador(Player *jogador, int selecao)
         jogador->x = TELA_LARGURA / 2 - jogador->w;
         jogador->y = TELA_ALTURA / 2 - jogador->h;
         jogador->velocidadeY = 0;
-        jogador->velocidade_movimento = 250;
+        jogador->velocidade_movimento = 1000;
         jogador->forca_salto = -80;
 
         idle[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
@@ -45,12 +46,18 @@ bool iniciaJogador(Player *jogador, int selecao)
             }
         }
     }
+    if (selecao == 1) // Personagem esquilo
+    {
+        printf("Esquilo nao implementado\n");
+        return 0;
+    }
+
     return 1;
 }
 
 int main(int argc, char *args[])
 {
-    printf("\nPara fins de teste:\n\nEspaco: +100 pontos\nC: -1 vida\nF: +3fichas (ao acabar o jogo)\n");
+    printf("\nPara fins de teste:\n\nEspaco: +100 pontos\nC: -1 vida\nF: +3 fichas (ao acabar o jogo)\n");
 
     if (iniciaJanela())
     {
@@ -76,6 +83,11 @@ int main(int argc, char *args[])
                     }
                 }
                 telaFinal();
+            }
+            else
+            {
+                destroi(janela);
+                return 0;
             }
         }
     }
