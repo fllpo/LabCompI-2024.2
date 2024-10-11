@@ -12,6 +12,7 @@ int main(int argc, char *args[])
         telaApresentacao();
         telaInicial(&jogador);
         int selecao = telaSelecaoPersonagem(&jogador);
+
         while (jogador.fichas > 0)
         {
             if (iniciaJogador(&jogador, selecao))

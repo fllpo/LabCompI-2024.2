@@ -77,7 +77,6 @@ bool iniciaJogador(Player *jogador, int selecao)
 {
     jogador->vida = 3;
     jogador->pontos = 0;
-    jogador->recorde = 0;
     jogador->movDireita = false;
     jogador->direcao = 0;
     jogador->movEsquerda = false;

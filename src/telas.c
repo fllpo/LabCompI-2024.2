@@ -3,6 +3,7 @@
 
 void telaJogo()
 {
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
     processaEventosJogo(&jogador, &e);
     renderiza();
 }
@@ -10,6 +11,7 @@ void telaJogo()
 int telaSelecaoPersonagem(Player *jogador)
 {
     int menu = 1, selecao = 0;
+    jogador->recorde = 0;
     SDL_Texture *personagens[4];
     SDL_Rect molduraExterna = {145, 145, 310, 310};
     SDL_Rect molduraInterna = {150, 150, 300, 300};
@@ -184,7 +186,8 @@ void telaPause() // OK
 void telaFinal(Player *jogador) // TODO
 {
     jogador->fichas--;
-    int final = 1;
+    char nome[4] = {0};
+    int i = 0, final = 1;
     while (final)
     {
         SDL_RenderClear(renderizador);
@@ -192,8 +195,11 @@ void telaFinal(Player *jogador) // TODO
         if (jogador->fichas == 0)
         {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            escreveTexto("Pressione F para adicionar mais fichas!", 200, 250, BRANCO);
+            escreveTexto("Pressione espaco para adicionar mais fichas!", 200, 250, BRANCO);
+            escreveTexto("Escreva seu nome (max 3 letras):", 100, 400, BRANCO);
+            escreveTexto(nome, 100, 450, BRANCO);
             exibeFichas(jogador->fichas);
+
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -208,19 +214,50 @@ void telaFinal(Player *jogador) // TODO
                     case SDLK_ESCAPE:
                         destroi(janela);
                         exit(0);
-                    case SDLK_f:
+                    case SDLK_SPACE:
                         jogador->fichas += 3;
                         exibeFichas(jogador->fichas);
                         SDL_Delay(500);
                         break;
+                    case SDLK_BACKSPACE:
+                        if (i > 0)
+                        {
+                            i--;
+                            nome[i] = '\0';
+                        }
+                        break;
                     case SDLK_RETURN:
-                        final = 0;
+                        if (i > 0)
+                        {
+                            final = 0;
+                        }
+                        break;
+                    default:
+                        if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
+                        {
+                            nome[i] = toupper(e.key.keysym.sym);
+                            i++;
+                        }
                         break;
                     }
                 }
             }
-        }
+            if (i == 3)
+            {
+                if (jogador->recorde < jogador->pontos)
+                {
+                    jogador->recorde = jogador->pontos;
+                    gravarRecordes(nome, jogador->recorde);
+                }
+                else
+                    gravarRecordes(nome, jogador->recorde);
 
+                escreveTexto(nome, 100, 450, BRANCO);
+                SDL_RenderPresent(renderizador);
+                SDL_Delay(1000);
+                final = 0;
+            }
+        }
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
@@ -245,13 +282,12 @@ void telaFinal(Player *jogador) // TODO
                     }
                 }
             }
+            if (jogador->recorde < jogador->pontos)
+            {
+                jogador->recorde = jogador->pontos;
+            }
         }
         SDL_RenderPresent(renderizador);
-    }
-    if (jogador->recorde < jogador->pontos)
-    {
-        jogador->recorde = jogador->pontos;
-        gravarRecordes("FEL", jogador->recorde);
     }
 }
 void telaApresentacao() // OK
