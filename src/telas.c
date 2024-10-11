@@ -67,28 +67,36 @@ int telaSelecaoPersonagem(Player *jogador) // TODO
 }
 void telaRecordes() // OK
 {
-    char score[10];
-    int menu = 1;
+    Recorde recordes[MAX_RECORDES];
+    int numRecordes = 0, menu = 1;
     FILE *arquivo = fopen("bin/score.bin", "rb");
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+    if (arquivo != NULL)
+    {
+        while (fread(&recordes[numRecordes], sizeof(Recorde), 1, arquivo) == 1 && numRecordes < MAX_RECORDES)
+        {
+            numRecordes++;
+        }
+        fclose(arquivo);
+    }
+    else
+    {
+        perror("Erro ao abrir arquivo score.bin");
+        return;
+    }
 
     while (menu)
     {
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         SDL_RenderClear(renderizador);
-        escreveTexto("Recordes", TELA_LARGURA / 2 - 50, 50, BRANCO);
+        escreveTexto("Recordes", TELA_LARGURA / 2 - 50, 10, BRANCO);
 
-        if (arquivo != NULL)
+        for (int i = 0; i < numRecordes; i++)
         {
-            fseek(arquivo, 0, SEEK_SET);
-            for (int i = 0; i < 10; i++)
-            {
-                fread(&score, sizeof(score), 1, arquivo);
-
-                escreveTexto(score, TELA_LARGURA / 2 - 50, 100 + (i * 30), BRANCO);
-            }
+            char textoRecorde[100];
+            snprintf(textoRecorde, sizeof(textoRecorde), "%d. %s - %d", i + 1, recordes[i].nome, recordes[i].pontos);
+            escreveTexto(textoRecorde, 10, 50 + i * ALTURA_LINHA, BRANCO);
         }
-        else
-            perror("Erro ao abrir arquivo score.bin");
 
         while (SDL_PollEvent(&e))
         {
@@ -113,7 +121,6 @@ void telaRecordes() // OK
 
         SDL_RenderPresent(renderizador);
     }
-    fclose(arquivo);
 }
 void telaPause() // OK
 {

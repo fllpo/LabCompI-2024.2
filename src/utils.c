@@ -154,16 +154,56 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_DestroyTexture(textoTextura);
 }
 
-void gravarRecordes(char *nomeJogador, int maiorPonto) // TODO: Ordenação de recordes; Receber nomes dinamicamente
+void gravarRecordes(char *nomeJogador, int maiorPonto)
 {
-    char registro[10];
-    sprintf(registro, "%s %d\n", nomeJogador, maiorPonto);
-    FILE *arquivo = fopen("bin/score.bin", "ab");
+
+    Recorde recordes[MAX_REGISTROS];
+    int numRecordes = 0;
+    FILE *arquivo = fopen("bin/score.bin", "rb");
     if (arquivo != NULL)
     {
-        fwrite(registro, sizeof(registro), 1, arquivo);
+        while (fread(&recordes[numRecordes], sizeof(Recorde), 1, arquivo) == 1 && numRecordes < MAX_REGISTROS)
+        {
+            numRecordes++;
+        }
         fclose(arquivo);
     }
     else
         perror("Erro ao abrir arquivo score.bin");
+
+    if (numRecordes < MAX_REGISTROS)
+    {
+        strncpy(recordes[numRecordes].nome, nomeJogador, sizeof(recordes[numRecordes].nome) - 1);
+        recordes[numRecordes].nome[sizeof(recordes[numRecordes].nome) - 1] = '\n';
+        recordes[numRecordes].pontos = maiorPonto;
+        numRecordes++;
+    }
+
+    // Ordena os recordes
+    for (int i = 0; i < numRecordes - 1; i++)
+    {
+        for (int j = 0; j < numRecordes - i - 1; j++)
+        {
+            if (recordes[j].pontos < recordes[j + 1].pontos)
+            {
+                Recorde temp = recordes[j];
+                recordes[j] = recordes[j + 1];
+                recordes[j + 1] = temp;
+            }
+        }
+    }
+
+    arquivo = fopen("bin/score.bin", "wb");
+    if (arquivo != NULL)
+    {
+        for (int i = 0; i < numRecordes; i++)
+        {
+            fwrite(&recordes[i], sizeof(Recorde), 1, arquivo);
+        }
+        fclose(arquivo);
+    }
+    else
+    {
+        perror("Erro ao abrir arquivo score.bin para escrita");
+    }
 }

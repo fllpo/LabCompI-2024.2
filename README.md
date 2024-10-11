@@ -12,9 +12,9 @@ Insira um gif ou um link de alguma demonstração
 
 ## Autores
 
-- [@André](https://www.github.com/)
+- [@André Silvestre](https://www.github.com/)
 - [@Fellipe Oliveira](https://www.github.com/fllpo)
-- [@Guilherme](https://www.github.com/)
+- [@Guilherme Magno](https://github.com/Guiguineitor)
 
 ## Rodando localmente
 

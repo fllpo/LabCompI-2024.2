@@ -8,3 +8,4 @@ all : src/$(OBJS)
 	$(CC) src/$(OBJS) $(LD_FLAGS) -o bin/$(OBJ_NAME) -Wall
 	./bin/$(OBJ_NAME)
 	rm ./bin/$(OBJ_NAME)
+	clear
