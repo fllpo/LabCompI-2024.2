@@ -4,9 +4,7 @@
 void telaJogo()
 {
 
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-    processaEventosJogo(&e);
-
+    processaEventosJogo(&jogador, &e);
     renderiza();
 }
 
@@ -45,7 +43,7 @@ int telaSelecaoPersonagem()
         escreveTexto("Coelho", 500, 300, PRETO);
         escreveTexto("Charmander", 500, 350, PRETO);
 
-        exibeFichas(jogador.fichas);
+        exibeFichas(jogador->fichas);
 
         switch (selecao)
         {
@@ -100,31 +98,38 @@ int telaSelecaoPersonagem()
 
     return selecao;
 }
-
 void telaRecordes() // OK
 {
-    char score[10];
-    int menu = 1;
+    Recorde recordes[MAX_RECORDES];
+    int numRecordes = 0, menu = 1;
     FILE *arquivo = fopen("bin/score.bin", "rb");
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+    if (arquivo != NULL)
+    {
+        while (fread(&recordes[numRecordes], sizeof(Recorde), 1, arquivo) == 1 && numRecordes < MAX_RECORDES)
+        {
+            numRecordes++;
+        }
+        fclose(arquivo);
+    }
+    else
+    {
+        perror("Erro ao abrir arquivo score.bin");
+        return;
+    }
 
     while (menu)
     {
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         SDL_RenderClear(renderizador);
-        escreveTexto("Recordes", TELA_LARGURA / 2 - 50, 50, BRANCO);
+        escreveTexto("Recordes", TELA_LARGURA / 2 - 50, 10, BRANCO);
 
-        if (arquivo != NULL)
+        for (int i = 0; i < numRecordes; i++)
         {
-            fseek(arquivo, 0, SEEK_SET);
-            for (int i = 0; i < 10; i++)
-            {
-                fread(&score, sizeof(score), 1, arquivo);
-
-                escreveTexto(score, TELA_LARGURA / 2 - 50, 100 + (i * 30), BRANCO);
-            }
+            char textoRecorde[100];
+            snprintf(textoRecorde, sizeof(textoRecorde), "%d. %s - %d", i + 1, recordes[i].nome, recordes[i].pontos);
+            escreveTexto(textoRecorde, 10, 50 + i * ALTURA_LINHA, BRANCO);
         }
-        else
-            perror("Erro ao abrir arquivo score.bin");
 
         while (SDL_PollEvent(&e))
         {
@@ -149,7 +154,6 @@ void telaRecordes() // OK
 
         SDL_RenderPresent(renderizador);
     }
-    fclose(arquivo);
 }
 void telaPause() // OK
 {
@@ -177,18 +181,19 @@ void telaPause() // OK
         }
     }
 }
-void telaFinal() // TODO
+void telaFinal(Player *jogador) // TODO
 {
-    jogador.fichas--;
+    jogador->fichas--;
     int final = 1;
     while (final)
     {
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (jogador.fichas == 0)
+        if (jogador->fichas == 0)
         {
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            exibeFichas(jogador.fichas);
+            escreveTexto("Pressione F para adicionar mais fichas!", 200, 250, BRANCO);
+            exibeFichas(jogador->fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -204,8 +209,8 @@ void telaFinal() // TODO
                         destroi(janela);
                         exit(0);
                     case SDLK_f:
-                        jogador.fichas += 3;
-                        exibeFichas(jogador.fichas);
+                        jogador->fichas += 3;
+                        exibeFichas(jogador->fichas);
                         SDL_Delay(500);
                         break;
                     case SDLK_RETURN:
@@ -219,7 +224,7 @@ void telaFinal() // TODO
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
-            exibeFichas(jogador.fichas);
+            exibeFichas(jogador->fichas);
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)
@@ -243,10 +248,10 @@ void telaFinal() // TODO
         }
         SDL_RenderPresent(renderizador);
     }
-    if (jogador.recorde < jogador.pontos)
+    if (jogador->recorde < jogador->pontos)
     {
-        jogador.recorde = jogador.pontos;
-        gravarRecordes("FEL", jogador.recorde);
+        jogador->recorde = jogador->pontos;
+        gravarRecordes("FEL", jogador->recorde);
     }
 }
 void telaApresentacao() // OK
@@ -328,11 +333,11 @@ void telaInstrucoes() // TODO
         SDL_RenderPresent(renderizador);
     }
 }
-void telaInicial() // OK
+void telaInicial(Player *jogador) // OK
 {
 
     int inicial = 1, selecao = 0;
-    jogador.fichas = 3;
+    jogador->fichas = 3;
 
     while (inicial)
     {
@@ -342,7 +347,7 @@ void telaInicial() // OK
         escreveTexto("Instrucoes", 200, 250, PRETO);
         escreveTexto("Recordes", 200, 300, PRETO);
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
-        exibeFichas(jogador.fichas);
+        exibeFichas(jogador->fichas);
 
         switch (selecao)
         {

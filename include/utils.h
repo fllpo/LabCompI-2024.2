@@ -30,5 +30,14 @@ void destroi();
 void escreveTexto(char *texto, int x, int y, SDL_Color cor);
 void exibeFichas(int fichas);
 void exibePontos(int pontos);
+typedef struct
+{
+    char nome[20];
+    int pontos;
+} Recorde;
+#define MAX_REGISTROS 100
+#define TAM_REGISTRO 50
+#define MAX_RECORDES 10
+#define ALTURA_LINHA 30
 
 #endif
