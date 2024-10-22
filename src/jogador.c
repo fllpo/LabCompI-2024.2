@@ -14,41 +14,24 @@ bool iniciaJogador(Player *jogador, int selecao)
     jogador->y = TELA_ALTURA / 2 - jogador->h;
     jogador->velocidadeY = 0;
     const char *personagem;
-    int num_idle, num_run, num_jump;
 
     switch (selecao)
     {
     case 0:
         personagem = "Foxy";
-        num_idle = 4;
-        num_run = 6;
-        num_jump = 2;
-        jogador->velocidade_movimento = 900;
-        jogador->forca_salto = -60;
+        jogador->num_idle = 4;
+        jogador->num_run = 6;
+        jogador->num_jump = 2;
+        jogador->velocidade_movimento = 1000;
+        jogador->forca_salto = -80;
         break;
     case 1:
         personagem = "Squirrel";
-        num_idle = 8;
-        num_run = 6;
-        num_jump = 4;
+        jogador->num_idle = 8;
+        jogador->num_run = 6;
+        jogador->num_jump = 4;
         jogador->velocidade_movimento = 1000;
-        jogador->forca_salto = -80;
-        break;
-    case 2:
-        personagem = "sunny-bunny";
-        num_idle = 4; // Ajuste esses números conforme necessário
-        num_run = 6;
-        num_jump = 5;
-        jogador->velocidade_movimento = 1000;
-        jogador->forca_salto = -80;
-        break;
-    case 3:
-        personagem = "Fiery Imp";
-        num_idle = 4; // Ajuste esses números conforme necessário
-        num_run = 8;
-        num_jump = 5;
-        jogador->velocidade_movimento = 1000;
-        jogador->forca_salto = -80;
+        jogador->forca_salto = -60;
         break;
     default:
         printf("Seleção de personagem inválida.\n");
@@ -58,7 +41,7 @@ bool iniciaJogador(Player *jogador, int selecao)
     char caminho[256];
 
     // Carregando texturas idle
-    for (int i = 0; i < num_idle; i++)
+    for (int i = 0; i < jogador->num_idle; i++)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/idle/player-idle-%d.png", personagem, i + 1);
         idle[i] = IMG_LoadTexture(renderizador, caminho);
@@ -70,7 +53,7 @@ bool iniciaJogador(Player *jogador, int selecao)
     }
 
     // Carregando texturas run
-    for (int i = 0; i < num_run; i++)
+    for (int i = 0; i < jogador->num_run; i++)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/run/player-run-%d.png", personagem, i + 1);
         run[i] = IMG_LoadTexture(renderizador, caminho);
@@ -82,7 +65,7 @@ bool iniciaJogador(Player *jogador, int selecao)
     }
 
     // Carregando texturas jump
-    for (int i = 0; i < num_jump; i++)
+    for (int i = 0; i < jogador->num_jump; i++)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/jump/player-jump-%d.png", personagem, i + 1);
         jump[i] = IMG_LoadTexture(renderizador, caminho);

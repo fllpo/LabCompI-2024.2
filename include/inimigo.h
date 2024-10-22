@@ -10,10 +10,10 @@ typedef struct Inimigo
 
 } Inimigo;
 
-Inimigo inimigo = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 80, 80};
+Inimigo inimigo = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 60, 60};
 
 bool iniciaInimigo(Inimigo *inimigo);
-void atualizaInimigo(Inimigo *inimigo);
+void atualizaInimigo(Inimigo *inimigo, Player *jogador);
 void desenhaInimigo(Inimigo *inimigo);
 
 #endif

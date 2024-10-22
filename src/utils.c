@@ -79,13 +79,14 @@ void renderiza()
 
     // Atualiza as posições dos objetos
     atualizaJogador(&jogador);
-    atualizaInimigo(&inimigo);
+    atualizaInimigo(&inimigo, &jogador);
 
     // Renderiza todos os elementos
     desenhaInimigo(&inimigo);
     desenhaJogador(&jogador, idle, run, jump);
 
     // Exibe informações na tela
+
     exibeVida(jogador.vida);
     exibePontos(jogador.pontos);
 
@@ -93,6 +94,11 @@ void renderiza()
     SDL_RenderPresent(renderizador);
 
     // Controle de FPS
+    limitaFPS();
+}
+
+void limitaFPS()
+{
     frameTime = SDL_GetTicks() - frameStart;
     if (frameTime < FRAME_DELAY)
     {
@@ -190,10 +196,22 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_DestroyTexture(textoTextura);
 }
 
-void gravarRecordes(char *nomeJogador, int maiorPonto) // OK
+void gravarRecordes(char *nomeJogador, int maiorPonto)
 {
-
     Recorde recordes[MAX_REGISTROS];
+    int numRecordes = carregarRecordes(recordes);
+
+    if (numRecordes < MAX_REGISTROS)
+    {
+        adicionarNovoRecorde(recordes, &numRecordes, nomeJogador, maiorPonto);
+    }
+
+    ordenarRecordes(recordes, numRecordes);
+    salvarRecordes(recordes, numRecordes);
+}
+
+int carregarRecordes(Recorde *recordes)
+{
     int numRecordes = 0;
     FILE *arquivo = fopen("bin/score.bin", "rb");
     if (arquivo != NULL)
@@ -204,18 +222,19 @@ void gravarRecordes(char *nomeJogador, int maiorPonto) // OK
         }
         fclose(arquivo);
     }
-    else
-        perror("Erro ao abrir arquivo score.bin");
+    return numRecordes;
+}
 
-    if (numRecordes < MAX_REGISTROS)
-    {
-        strncpy(recordes[numRecordes].nome, nomeJogador, sizeof(recordes[numRecordes].nome) - 1);
-        recordes[numRecordes].nome[sizeof(recordes[numRecordes].nome) - 1] = '\n';
-        recordes[numRecordes].pontos = maiorPonto;
-        numRecordes++;
-    }
+void adicionarNovoRecorde(Recorde *recordes, int *numRecordes, char *nomeJogador, int maiorPonto)
+{
+    strncpy(recordes[*numRecordes].nome, nomeJogador, sizeof(recordes[*numRecordes].nome) - 1);
+    recordes[*numRecordes].nome[sizeof(recordes[*numRecordes].nome) - 1] = '\0';
+    recordes[*numRecordes].pontos = maiorPonto;
+    (*numRecordes)++;
+}
 
-    // Ordena os recordes
+void ordenarRecordes(Recorde *recordes, int numRecordes)
+{
     for (int i = 0; i < numRecordes - 1; i++)
     {
         for (int j = 0; j < numRecordes - i - 1; j++)
@@ -228,8 +247,11 @@ void gravarRecordes(char *nomeJogador, int maiorPonto) // OK
             }
         }
     }
+}
 
-    arquivo = fopen("bin/score.bin", "wb");
+void salvarRecordes(Recorde *recordes, int numRecordes)
+{
+    FILE *arquivo = fopen("bin/score.bin", "wb");
     if (arquivo != NULL)
     {
         for (int i = 0; i < numRecordes; i++)

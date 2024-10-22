@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "utils.c"
 #include "jogador.c"
 #include "inimigo.c"
@@ -6,7 +5,8 @@
 
 int main(int argc, char *args[])
 {
-    printf("\nPara fins de teste:\n\nEspaco: +100 pontos\nC: -1 vida\nF: +3 fichas (ao acabar o jogo)\n");
+    // printf("\e[1;1H\e[2J");
+    printf("Para fins de teste:\n\nEspaco: +pontos\nF: +3 fichas (ao acabar o jogo)\n");
 
     if (iniciaJanela())
     {

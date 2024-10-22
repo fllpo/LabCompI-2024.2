@@ -30,6 +30,8 @@ void destroi();
 void escreveTexto(char *texto, int x, int y, SDL_Color cor);
 void exibeFichas(int fichas);
 void exibePontos(int pontos);
+void limitaFPS();
+
 typedef struct
 {
     char nome[20];
@@ -39,5 +41,10 @@ typedef struct
 #define TAM_REGISTRO 50
 #define MAX_RECORDES 10
 #define ALTURA_LINHA 30
+int carregarRecordes(Recorde *recordes);
+void gravarRecordes(char *nomeJogador, int maiorPonto);
+void adicionarNovoRecorde(Recorde *recordes, int *numRecordes, char *nomeJogador, int maiorPonto);
+void ordenarRecordes(Recorde *recordes, int numRecordes);
+void salvarRecordes(Recorde *recordes, int numRecordes);
 
 #endif

@@ -10,9 +10,9 @@ void telaJogo()
 
 int telaSelecaoPersonagem(Player *jogador)
 {
-    int menu = 1, selecao = 0;
+    int menu = 1, selecao = 0, num_personagens = 2;
     jogador->recorde = 0;
-    SDL_Texture *personagens[4];
+    SDL_Texture *personagens[num_personagens];
     SDL_Rect molduraExterna = {145, 145, 310, 310};
     SDL_Rect molduraInterna = {150, 150, 300, 300};
     SDL_Rect imagemRect = {160, 160, 280, 280};
@@ -20,8 +20,6 @@ int telaSelecaoPersonagem(Player *jogador)
     // Carregando as imagens dos personagens
     personagens[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
     personagens[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Squirrel/Sprites/idle/player-idle-1.png");
-    personagens[2] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/sunny-bunny/Sprites/idle/player-idle-1.png");
-    personagens[3] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Fiery Imp/Sprites/idle/player-idle-1.png");
 
     while (menu)
     {
@@ -41,8 +39,6 @@ int telaSelecaoPersonagem(Player *jogador)
 
         escreveTexto("Raposa", 500, 200, PRETO);
         escreveTexto("Esquilo", 500, 250, PRETO);
-        escreveTexto("Coelho", 500, 300, PRETO);
-        escreveTexto("Charmander", 500, 350, PRETO);
 
         exibeFichas(jogador->fichas);
 
@@ -53,12 +49,6 @@ int telaSelecaoPersonagem(Player *jogador)
             break;
         case 1:
             escreveTexto("Esquilo", 500, 250, BRANCO);
-            break;
-        case 2:
-            escreveTexto("Coelho", 500, 300, BRANCO);
-            break;
-        case 3:
-            escreveTexto("Charmander", 500, 350, BRANCO);
             break;
         }
         while (SDL_PollEvent(&e))
@@ -80,7 +70,7 @@ int telaSelecaoPersonagem(Player *jogador)
                         selecao--;
                     break;
                 case SDLK_DOWN:
-                    if (selecao < 3)
+                    if (selecao < 1)
                         selecao++;
                     break;
                 case SDLK_RETURN:
@@ -93,7 +83,7 @@ int telaSelecaoPersonagem(Player *jogador)
     }
 
     // Liberar as texturas dos personagens
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < num_personagens; i++)
     {
         SDL_DestroyTexture(personagens[i]);
     }
@@ -371,7 +361,6 @@ void telaInstrucoes() // TODO
 }
 void telaInicial(Player *jogador) // OK
 {
-
     int inicial = 1, selecao = 0;
 
     while (inicial)

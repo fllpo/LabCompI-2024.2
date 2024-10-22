@@ -5,26 +5,26 @@
 bool iniciaInimigo(Inimigo *inimigo)
 {
     inimigo->vida = 1;
-    inimigo->movDireita = false;
     inimigo->direcao = 0;
-    inimigo->movEsquerda = false;
     inimigo->pulando = true;
-    inimigo->x = 550;
+    inimigo->x = 50;
     inimigo->y = TELA_ALTURA / 2 - inimigo->h;
     inimigo->velocidadeY = 0;
-
+    inimigo->velocidade_movimento = 200;
+    printf("Inimigo iniciado\n");
     return true;
 }
 
-void atualizaInimigo(Inimigo *inimigo)
+void atualizaInimigo(Inimigo *inimigo, Player *jogador)
 {
+
     // Movimento horizontal
-    if (inimigo->movDireita)
+    if (inimigo->x < jogador->x)
     {
         inimigo->x += inimigo->velocidade_movimento * deltaTime;
         inimigo->direcao = 0;
     }
-    if (inimigo->movEsquerda)
+    if (inimigo->x > jogador->x)
     {
         inimigo->x -= inimigo->velocidade_movimento * deltaTime;
         inimigo->direcao = 1;
