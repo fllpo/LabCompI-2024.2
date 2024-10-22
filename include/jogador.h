@@ -16,8 +16,9 @@ SDL_Texture *idle[4];
 SDL_Texture *run[6];
 SDL_Texture *jump[2];
 
-void moveJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump);
-void exibeVida(int vida);
-void renderizaJogador(Player *jogador);
+void desenhaJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump);
 bool iniciaJogador(Player *jogador, int selecao);
+void atualizaJogador(Player *jogador);
+
+void exibeVida(int vida);
 #endif

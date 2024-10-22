@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "utils.c"
 #include "jogador.c"
+#include "inimigo.c"
 #include "telas.c"
 
 int main(int argc, char *args[])
@@ -15,7 +16,7 @@ int main(int argc, char *args[])
 
         while (jogador.fichas > 0)
         {
-            if (iniciaJogador(&jogador, selecao))
+            if (iniciaJogador(&jogador, selecao) && iniciaInimigo(&inimigo))
             {
                 while (jogador.vida > 0)
                 {

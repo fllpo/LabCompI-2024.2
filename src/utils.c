@@ -1,5 +1,6 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
+#include "../include/inimigo.h"
 #include "../include/telas.h"
 
 int iniciaJanela(void)
@@ -72,7 +73,42 @@ void destroi(SDL_Window *janela)
 
 void renderiza()
 {
-    moveJogador(&jogador, idle, run, jump);
+    // Limpa o renderizador uma vez por frame
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+    SDL_RenderClear(renderizador);
+
+    // Atualiza as posições dos objetos
+    atualizaJogador(&jogador);
+    atualizaInimigo(&inimigo);
+
+    // Renderiza todos os elementos
+    desenhaInimigo(&inimigo);
+    desenhaJogador(&jogador, idle, run, jump);
+
+    // Exibe informações na tela
+    exibeVida(jogador.vida);
+    exibePontos(jogador.pontos);
+
+    // Apresenta o frame completo
+    SDL_RenderPresent(renderizador);
+
+    // Controle de FPS
+    frameTime = SDL_GetTicks() - frameStart;
+    if (frameTime < FRAME_DELAY)
+    {
+        SDL_Delay(FRAME_DELAY - frameTime);
+    }
+}
+
+bool colisao(Player *jogador, Inimigo *inimigo)
+{
+    if (jogador->x + jogador->w >= inimigo->x && jogador->x <= inimigo->x + inimigo->w &&
+        jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
+    {
+        jogador->vida--;
+        return true;
+    }
+    return false;
 }
 
 void processaEventosJogo(Player *jogador, SDL_Event *e)
@@ -154,7 +190,7 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_DestroyTexture(textoTextura);
 }
 
-void gravarRecordes(char *nomeJogador, int maiorPonto)
+void gravarRecordes(char *nomeJogador, int maiorPonto) // OK
 {
 
     Recorde recordes[MAX_REGISTROS];
