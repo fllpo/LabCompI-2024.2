@@ -1,6 +1,7 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
+#include "../include/npc.h"
 #include "../include/telas.h"
 
 int iniciaJanela(void)
@@ -80,10 +81,12 @@ void renderiza()
     // Atualiza as posições dos objetos
     atualizaJogador(&jogador);
     atualizaInimigo(&inimigo, &jogador);
+    atualizaNPC(&npc, &jogador);
 
     // Renderiza todos os elementos
     desenhaInimigo(&inimigo);
     desenhaJogador(&jogador, idle, run, jump);
+    desenhaNPC(&npc);
 
     // Exibe informações na tela
 
@@ -106,15 +109,31 @@ void limitaFPS()
     }
 }
 
-bool colisao(Player *jogador, Inimigo *inimigo)
+void colisao(Player *jogador, Inimigo *inimigo, Npc *npc)
 {
     if (jogador->x + jogador->w >= inimigo->x && jogador->x <= inimigo->x + inimigo->w &&
         jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
     {
-        jogador->vida--;
-        return true;
+        if (jogador->resgatando == false)
+        {
+            jogador->vida--;
+        }
+        else if (jogador->resgatando == true)
+        {
+            jogador->resgatando = false;
+            npc->resgatado = false;
+            // deixar personagem imune por 2 segundos
+        }
     }
-    return false;
+    if (jogador->x + jogador->w >= npc->x && jogador->x <= npc->x + npc->w &&
+        jogador->y + jogador->h >= npc->y && jogador->y <= npc->y + npc->h)
+    {
+        if (npc->resgatado == false)
+        {
+            jogador->pontos = jogador->pontos + 100;
+            npc->resgatado = true;
+        }
+    }
 }
 
 void processaEventosJogo(Player *jogador, SDL_Event *e)
@@ -148,7 +167,6 @@ void processaEventosJogo(Player *jogador, SDL_Event *e)
                     jogador->pulando = true;
                     jogador->nochao = false;
                     jogador->velocidadeY = jogador->forca_salto;
-                    jogador->pontos += 5;
                 }
                 break;
             }

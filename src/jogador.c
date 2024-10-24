@@ -13,6 +13,7 @@ bool iniciaJogador(Player *jogador, int selecao)
     jogador->x = TELA_LARGURA / 2 - jogador->w;
     jogador->y = TELA_ALTURA / 2 - jogador->h;
     jogador->velocidadeY = 0;
+    jogador->resgatando = false;
     const char *personagem;
 
     switch (selecao)
@@ -109,10 +110,7 @@ void atualizaJogador(Player *jogador)
         }
     }
 
-    if (colisao(jogador, &inimigo))
-    {
-        jogador->vida--;
-    }
+    colisao(jogador, &inimigo, &npc);
 }
 
 void desenhaJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)

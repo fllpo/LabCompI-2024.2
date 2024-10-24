@@ -2,10 +2,11 @@
 #include "jogador.c"
 #include "inimigo.c"
 #include "telas.c"
+#include "npc.c"
 
 int main(int argc, char *args[])
 {
-    // printf("\e[1;1H\e[2J");
+
     printf("Para fins de teste:\n\nEspaco: +pontos\nF: +3 fichas (ao acabar o jogo)\n");
 
     if (iniciaJanela())
@@ -16,8 +17,9 @@ int main(int argc, char *args[])
 
         while (jogador.fichas > 0)
         {
-            if (iniciaJogador(&jogador, selecao) && iniciaInimigo(&inimigo))
+            if (iniciaJogador(&jogador, selecao) && iniciaNPC(&npc) && iniciaInimigo(&inimigo))
             {
+
                 while (jogador.vida > 0)
                 {
                     Uint32 frameStart = SDL_GetTicks();
