@@ -1,19 +1,25 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
+#include "../include/npc.h"
+#include "../include/estruturas.h"
 
-bool iniciaJogador(Player *jogador, int selecao)
+Jogador jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
+
+bool iniciaJogador(Jogador *jogador, int selecao)
 {
     jogador->vida = 1;
     jogador->pontos = 0;
     jogador->movDireita = false;
-    jogador->direcao = 0;
+    jogador->viradoParaEsquerda = 0;
     jogador->movEsquerda = false;
     jogador->pulando = true;
     jogador->x = TELA_LARGURA / 2 - jogador->w;
+    jogador->scrollX = 0;
     jogador->y = TELA_ALTURA / 2 - jogador->h;
     jogador->velocidadeY = 0;
     jogador->resgatando = false;
+    jogador->imune = false;
     const char *personagem;
 
     switch (selecao)
@@ -77,22 +83,26 @@ bool iniciaJogador(Player *jogador, int selecao)
         }
     }
 
-    printf("Todas as texturas carregadas com sucesso para %s.\n", personagem);
     return true;
 }
 
-void atualizaJogador(Player *jogador)
+void atualizaJogador(Jogador *jogador)
 {
     // Movimento horizontal
     if (jogador->movDireita)
     {
         jogador->x += jogador->velocidade_movimento * deltaTime;
-        jogador->direcao = 0;
+        jogador->viradoParaEsquerda = 0;
     }
     if (jogador->movEsquerda)
     {
         jogador->x -= jogador->velocidade_movimento * deltaTime;
-        jogador->direcao = 1;
+        jogador->viradoParaEsquerda = 1;
+    }
+    jogador->scrollX = -jogador->x + TELA_LARGURA / 2 - jogador->w;
+    if (jogador->scrollX > 0)
+    {
+        jogador->scrollX = 0;
     }
 
     // Pulo e queda
@@ -101,21 +111,22 @@ void atualizaJogador(Player *jogador)
         jogador->y += jogador->velocidadeY;
         jogador->velocidadeY += GRAVIDADE;
 
-        if (jogador->y >= TELA_ALTURA - jogador->h - 10)
+        if (jogador->y >= TELA_ALTURA - jogador->h - 50)
         {
-            jogador->y = TELA_ALTURA - jogador->h - 10;
+            jogador->y = TELA_ALTURA - jogador->h - 50;
             jogador->pulando = false;
             jogador->nochao = true;
             jogador->velocidadeY = 0;
         }
     }
 
-    colisao(jogador, &inimigo, &npc);
+    colisaoJogadorInimigo(jogador, &inimigo);
+    colisaoJogadorNPC(jogador, &npc);
 }
 
-void desenhaJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
+void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
 {
-    SDL_Rect rectPlayer = {jogador->x, jogador->y, jogador->w, jogador->h};
+    SDL_Rect rectJogador = {jogador->x + jogador->scrollX, jogador->y, jogador->w, jogador->h};
 
     SDL_Texture *texturaAtual;
     if (jogador->pulando || !jogador->nochao)
@@ -131,12 +142,5 @@ void desenhaJogador(Player *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_
         texturaAtual = idle[SDL_GetTicks() / 300 % 4];
     }
 
-    if (jogador->direcao == 1)
-    {
-        SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectPlayer, 0, NULL, SDL_FLIP_HORIZONTAL);
-    }
-    else
-    {
-        SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectPlayer);
-    }
+    jogador->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectJogador);
 }

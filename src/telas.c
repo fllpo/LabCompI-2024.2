@@ -1,5 +1,7 @@
 #include "../include/utils.h"
+#include "../include/utils_recordes.h"
 #include "../include/jogador.h"
+#include "../include/estruturas.h"
 
 void telaJogo()
 {
@@ -8,7 +10,7 @@ void telaJogo()
     renderiza();
 }
 
-int telaSelecaoPersonagem(Player *jogador)
+int telaSelecaoPersonagem(Jogador *jogador)
 {
     int menu = 1, selecao = 0, num_personagens = 2;
     jogador->recorde = 0;
@@ -150,7 +152,7 @@ void telaRecordes() // OK
 void telaPause() // OK
 {
     int pause = 1;
-    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
+    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, PRETO);
     SDL_RenderPresent(renderizador);
     while (pause)
     {
@@ -173,7 +175,7 @@ void telaPause() // OK
         }
     }
 }
-void telaFinal(Player *jogador) // TODO
+void telaFinal(Jogador *jogador) // TODO
 {
     jogador->fichas--;
     char nome[4] = {0};
@@ -359,7 +361,7 @@ void telaInstrucoes() // TODO
         SDL_RenderPresent(renderizador);
     }
 }
-void telaInicial(Player *jogador) // OK
+void telaInicial(Jogador *jogador) // OK
 {
     int inicial = 1, selecao = 0;
 

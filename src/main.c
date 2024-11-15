@@ -1,8 +1,18 @@
 #include "utils.c"
+#include "utils_recordes.c"
 #include "jogador.c"
 #include "inimigo.c"
 #include "telas.c"
 #include "npc.c"
+#include "cenario.c"
+
+int iniciaPersonagens(int selecao)
+{
+    iniciaJogador(&jogador, selecao);
+    iniciaNPC(&npc);
+    iniciaInimigo(&inimigo);
+    return 1;
+}
 
 int main(int argc, char *args[])
 {
@@ -17,9 +27,8 @@ int main(int argc, char *args[])
 
         while (jogador.fichas > 0)
         {
-            if (iniciaJogador(&jogador, selecao) && iniciaNPC(&npc) && iniciaInimigo(&inimigo))
+            if (iniciaPersonagens(selecao))
             {
-
                 while (jogador.vida > 0)
                 {
                     Uint32 frameStart = SDL_GetTicks();
@@ -38,7 +47,7 @@ int main(int argc, char *args[])
             }
             else
             {
-                printf("Falha ao iniciar o jogador. Encerrando o jogo.\n");
+                printf("Falha ao iniciar personagens. Encerrando o jogo.\n");
                 destroi(janela);
                 return 1;
             }

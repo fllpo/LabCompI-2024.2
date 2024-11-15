@@ -2,17 +2,11 @@
 #define NPC_H
 
 #include "utils.h"
-typedef struct Npc
-{
-    float x, y, h, w, velocidadeY;
-    int vida, velocidade_movimento, forca_salto;
-    bool movDireita, movEsquerda, pulando, direcao, nochao, resgatado;
+#include "estruturas.h"
 
-} Npc;
-
-Npc npc;
+extern Npc npc;
 bool iniciaNPC(Npc *npc);
-void atualizaNPC(Npc *inimigo, Player *jogador);
+void atualizaNPC(Npc *inimigo, Jogador *jogador);
 void desenhaNPC(Npc *inimigo);
-
+void colisaoJogadorNPC(Jogador *jogador, Npc *npc);
 #endif

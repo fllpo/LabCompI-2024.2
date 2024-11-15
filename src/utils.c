@@ -1,8 +1,10 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
+#include "../include/estruturas.h"
 #include "../include/npc.h"
 #include "../include/telas.h"
+#include "../include/cenario.h"
 
 int iniciaJanela(void)
 {
@@ -84,6 +86,8 @@ void renderiza()
     atualizaNPC(&npc, &jogador);
 
     // Renderiza todos os elementos
+    desenhaCenario();
+
     desenhaInimigo(&inimigo);
     desenhaJogador(&jogador, idle, run, jump);
     desenhaNPC(&npc);
@@ -109,34 +113,7 @@ void limitaFPS()
     }
 }
 
-void colisao(Player *jogador, Inimigo *inimigo, Npc *npc)
-{
-    if (jogador->x + jogador->w >= inimigo->x && jogador->x <= inimigo->x + inimigo->w &&
-        jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
-    {
-        if (jogador->resgatando == false)
-        {
-            jogador->vida--;
-        }
-        else if (jogador->resgatando == true)
-        {
-            jogador->resgatando = false;
-            npc->resgatado = false;
-            // deixar personagem imune por 2 segundos
-        }
-    }
-    if (jogador->x + jogador->w >= npc->x && jogador->x <= npc->x + npc->w &&
-        jogador->y + jogador->h >= npc->y && jogador->y <= npc->y + npc->h)
-    {
-        if (npc->resgatado == false)
-        {
-            jogador->pontos = jogador->pontos + 100;
-            npc->resgatado = true;
-        }
-    }
-}
-
-void processaEventosJogo(Player *jogador, SDL_Event *e)
+void processaEventosJogo(Jogador *jogador, SDL_Event *e)
 {
     while (SDL_PollEvent(e))
     {
@@ -195,13 +172,13 @@ void exibePontos(int pontos)
 {
     char texto[30];
     sprintf(texto, "Pontos:%d", pontos);
-    escreveTexto(texto, TELA_LARGURA - 200, 10, BRANCO);
+    escreveTexto(texto, TELA_LARGURA - 200, 10, PRETO);
 }
 void exibeVida(int vida)
 {
     char texto[50];
     sprintf(texto, "Vida: %d", vida);
-    escreveTexto(texto, 10, 10, BRANCO);
+    escreveTexto(texto, 10, 10, PRETO);
 }
 void escreveTexto(char *texto, int x, int y, SDL_Color cor)
 {
@@ -212,74 +189,4 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_QueryTexture(textoTextura, NULL, NULL, &textoPosicao.w, &textoPosicao.h);
     SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
     SDL_DestroyTexture(textoTextura);
-}
-
-void gravarRecordes(char *nomeJogador, int maiorPonto)
-{
-    Recorde recordes[MAX_REGISTROS];
-    int numRecordes = carregarRecordes(recordes);
-
-    if (numRecordes < MAX_REGISTROS)
-    {
-        adicionarNovoRecorde(recordes, &numRecordes, nomeJogador, maiorPonto);
-    }
-
-    ordenarRecordes(recordes, numRecordes);
-    salvarRecordes(recordes, numRecordes);
-}
-
-int carregarRecordes(Recorde *recordes)
-{
-    int numRecordes = 0;
-    FILE *arquivo = fopen("bin/score.bin", "rb");
-    if (arquivo != NULL)
-    {
-        while (fread(&recordes[numRecordes], sizeof(Recorde), 1, arquivo) == 1 && numRecordes < MAX_REGISTROS)
-        {
-            numRecordes++;
-        }
-        fclose(arquivo);
-    }
-    return numRecordes;
-}
-
-void adicionarNovoRecorde(Recorde *recordes, int *numRecordes, char *nomeJogador, int maiorPonto)
-{
-    strncpy(recordes[*numRecordes].nome, nomeJogador, sizeof(recordes[*numRecordes].nome) - 1);
-    recordes[*numRecordes].nome[sizeof(recordes[*numRecordes].nome) - 1] = '\0';
-    recordes[*numRecordes].pontos = maiorPonto;
-    (*numRecordes)++;
-}
-
-void ordenarRecordes(Recorde *recordes, int numRecordes)
-{
-    for (int i = 0; i < numRecordes - 1; i++)
-    {
-        for (int j = 0; j < numRecordes - i - 1; j++)
-        {
-            if (recordes[j].pontos < recordes[j + 1].pontos)
-            {
-                Recorde temp = recordes[j];
-                recordes[j] = recordes[j + 1];
-                recordes[j + 1] = temp;
-            }
-        }
-    }
-}
-
-void salvarRecordes(Recorde *recordes, int numRecordes)
-{
-    FILE *arquivo = fopen("bin/score.bin", "wb");
-    if (arquivo != NULL)
-    {
-        for (int i = 0; i < numRecordes; i++)
-        {
-            fwrite(&recordes[i], sizeof(Recorde), 1, arquivo);
-        }
-        fclose(arquivo);
-    }
-    else
-    {
-        perror("Erro ao abrir arquivo score.bin para escrita");
-    }
 }
