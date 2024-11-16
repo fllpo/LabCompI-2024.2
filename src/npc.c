@@ -2,34 +2,119 @@
 #include "../include/jogador.h"
 #include "../include/npc.h"
 
-Npc npc;
+Npc *npc = NULL;
+int num_npcs = 0;
 
-bool iniciaNPC(Npc *npc)
+bool criaNPCs(int quantidade)
+{
+    if (npc != NULL)
+    {
+        free(npc);
+    }
+
+    npc = (Npc *)malloc(quantidade * sizeof(Npc));
+    if (npc == NULL)
+    {
+        return false;
+    }
+
+    num_npcs = quantidade;
+
+    for (int i = 0; i < num_npcs; i++)
+    {
+        iniciaNPC(&npc[i], i);
+    }
+
+    return true;
+}
+
+bool iniciaNPC(Npc *npc, int index)
 {
     npc->viradoParaEsquerda = 0;
     npc->pulando = true;
     npc->h = 50;
     npc->w = 50;
-    npc->x = TELA_LARGURA - 25;
-    npc->y = TELA_ALTURA - 200;
+    npc->x = TELA_LARGURA - (200 * (index + 1));
+    npc->y = TELA_ALTURA - npc->h - 50;
     npc->velocidadeY = 0;
     npc->velocidade_movimento = 200;
     npc->resgatado = false;
+    npc->nochao = true;
     return true;
+}
+
+void atualizaTodosNPCs(Jogador *jogador)
+{
+    for (int i = 0; i < num_npcs; i++)
+    {
+        atualizaNPC(&npc[i], jogador);
+    }
+}
+
+void desenhaTodosNPCs()
+{
+    for (int i = 0; i < num_npcs; i++)
+    {
+        desenhaNPC(&npc[i]);
+    }
+}
+
+void verificaTodasColisoesNPC(Jogador *jogador)
+{
+    for (int i = 0; i < num_npcs; i++)
+    {
+        colisaoJogadorNPC(jogador, &npc[i]);
+    }
+}
+
+void liberaNPCs()
+{
+    if (npc != NULL)
+    {
+        free(npc);
+        npc = NULL;
+        num_npcs = 0;
+    }
 }
 
 void atualizaNPC(Npc *npc, Jogador *jogador)
 {
-
-    // Movimento horizontal
-    if (npc->resgatado == true)
+    int posicao_fila = 0;
+    if (npc->resgatado)
     {
-        if (npc->x + 50 < jogador->x)
+        for (int i = 0; i < num_npcs; i++)
+        {
+            if (&npc[i] == npc)
+            {
+                break;
+            }
+            if (npc[i].resgatado)
+            {
+                posicao_fila++;
+            }
+        }
+    }
+
+    if (npc->resgatado)
+    {
+
+        float alvo_x;
+
+        if (jogador->viradoParaEsquerda)
+        {
+            alvo_x = jogador->x + 70;
+        }
+        else
+        {
+            alvo_x = jogador->x - 50;
+        }
+
+        if (npc->x + 20 < alvo_x)
         {
             npc->x += jogador->velocidade_movimento * deltaTime;
             npc->viradoParaEsquerda = 0;
         }
-        if (npc->x - 100 > jogador->x)
+        if (npc->x - 20 > alvo_x)
         {
             npc->x -= jogador->velocidade_movimento * deltaTime;
             npc->viradoParaEsquerda = 1;

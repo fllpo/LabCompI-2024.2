@@ -2,23 +2,83 @@
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
 
-Inimigo inimigo = {TELA_LARGURA / 2, TELA_ALTURA / 2 - 25, 60, 60};
+Inimigo *inimigos = NULL;
+int num_inimigos = 0;
 
-bool iniciaInimigo(Inimigo *inimigo)
+bool criaInimigos(int quantidade)
+{
+    if (inimigos != NULL)
+    {
+        free(inimigos);
+    }
+
+    inimigos = (Inimigo *)malloc(quantidade * sizeof(Inimigo));
+    if (inimigos == NULL)
+    {
+        return false;
+    }
+
+    num_inimigos = quantidade;
+
+    for (int i = 0; i < num_inimigos; i++)
+    {
+        iniciaInimigo(&inimigos[i], i);
+    }
+
+    return true;
+}
+
+bool iniciaInimigo(Inimigo *inimigo, int index)
 {
     inimigo->vida = 1;
+    inimigo->h = 50;
+    inimigo->w = 50;
+    inimigo->x = TELA_LARGURA - (200 * (index + 1));
+    inimigo->y = TELA_ALTURA - inimigo->h - 50;
     inimigo->viradoParaEsquerda = 0;
     inimigo->pulando = true;
-    inimigo->x = 50;
-    inimigo->y = TELA_ALTURA / 2 - inimigo->h;
     inimigo->velocidadeY = 0;
     inimigo->velocidade_movimento = 200;
+    inimigo->nochao = true;
     return true;
+}
+
+void atualizaTodosInimigos(Jogador *jogador)
+{
+    for (int i = 0; i < num_inimigos; i++)
+    {
+        atualizaInimigo(&inimigos[i], jogador);
+    }
+}
+
+void desenhaTodosInimigos()
+{
+    for (int i = 0; i < num_inimigos; i++)
+    {
+        desenhaInimigo(&inimigos[i]);
+    }
+}
+
+void verificaTodasColisoesInimigo(Jogador *jogador)
+{
+    for (int i = 0; i < num_inimigos; i++)
+    {
+        colisaoJogadorInimigo(jogador, &inimigos[i]);
+    }
+}
+
+void liberaInimigos()
+{
+    if (inimigos != NULL)
+    {
+        free(inimigos);
+        inimigos = NULL;
+        num_inimigos = 0;
+    }
 }
 
 void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
 {
-
     // Movimento horizontal
     if (inimigo->x < jogador->x)
     {
@@ -53,6 +113,7 @@ void desenhaInimigo(Inimigo *inimigo)
     SDL_SetRenderDrawColor(renderizador, 255, 0, 0, 255);
     SDL_RenderFillRect(renderizador, &rectInimigo);
 }
+
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
 {
     if (jogador->x + jogador->w >= inimigo->x && jogador->x <= inimigo->x + inimigo->w &&

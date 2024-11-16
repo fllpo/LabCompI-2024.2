@@ -5,6 +5,7 @@
 #include "../include/estruturas.h"
 
 Jogador jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
+Inimigo inimigo;
 
 bool iniciaJogador(Jogador *jogador, int selecao)
 {
@@ -31,6 +32,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
         jogador->num_jump = 2;
         jogador->velocidade_movimento = 1000;
         jogador->forca_salto = -80;
+
         break;
     case 1:
         personagem = "Squirrel";
@@ -39,6 +41,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
         jogador->num_jump = 4;
         jogador->velocidade_movimento = 1000;
         jogador->forca_salto = -60;
+
         break;
     default:
         printf("Seleção de personagem inválida.\n");
@@ -46,6 +49,16 @@ bool iniciaJogador(Jogador *jogador, int selecao)
     }
 
     char caminho[256];
+
+    idle = (SDL_Texture **)malloc(jogador->num_idle * sizeof(SDL_Texture *));
+    run = (SDL_Texture **)malloc(jogador->num_run * sizeof(SDL_Texture *));
+    jump = (SDL_Texture **)malloc(jogador->num_jump * sizeof(SDL_Texture *));
+
+    if (!idle || !run || !jump)
+    {
+        printf("Erro na alocação de memória para as texturas\n");
+        return false;
+    }
 
     // Carregando texturas idle
     for (int i = 0; i < jogador->num_idle; i++)
@@ -119,9 +132,6 @@ void atualizaJogador(Jogador *jogador)
             jogador->velocidadeY = 0;
         }
     }
-
-    colisaoJogadorInimigo(jogador, &inimigo);
-    colisaoJogadorNPC(jogador, &npc);
 }
 
 void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
@@ -143,4 +153,25 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
 
     jogador->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectJogador);
+}
+
+void liberaJogador(Jogador *jogador)
+{
+    for (int i = 0; i < jogador->num_idle; i++)
+    {
+        SDL_DestroyTexture(idle[i]);
+    }
+    free(idle);
+
+    for (int i = 0; i < jogador->num_run; i++)
+    {
+        SDL_DestroyTexture(run[i]);
+    }
+    free(run);
+
+    for (int i = 0; i < jogador->num_jump; i++)
+    {
+        SDL_DestroyTexture(jump[i]);
+    }
+    free(jump);
 }

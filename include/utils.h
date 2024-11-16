@@ -19,6 +19,7 @@ SDL_Window *janela = NULL;
 SDL_Renderer *renderizador = NULL;
 SDL_Surface *telaSuperficie = NULL;
 SDL_Color BRANCO = {255, 255, 255, 255};
+SDL_Color AMARELO = {255, 255, 0, 255};
 SDL_Color PRETO = {0, 0, 0, 255};
 SDL_Event e;
 TTF_Font *fonte;

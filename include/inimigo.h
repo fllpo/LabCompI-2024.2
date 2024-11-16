@@ -3,8 +3,18 @@
 
 #include "utils.h"
 #include "estruturas.h"
-extern Inimigo inimigo;
+
+extern Inimigo *inimigos;
+extern int num_inimigos;
+
+bool criaInimigos(int quantidade);
+bool iniciaInimigo(Inimigo *inimigo, int index);
+void atualizaTodosInimigos(Jogador *jogador);
+void desenhaTodosInimigos(void);
+void verificaTodasColisoesInimigo(Jogador *jogador);
+void liberaInimigos(void);
 void atualizaInimigo(Inimigo *inimigo, Jogador *jogador);
 void desenhaInimigo(Inimigo *inimigo);
+void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo);
 
 #endif

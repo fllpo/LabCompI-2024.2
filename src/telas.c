@@ -1,11 +1,10 @@
 #include "../include/utils.h"
-#include "../include/utils_recordes.h"
+#include "../include/recordes.h"
 #include "../include/jogador.h"
 #include "../include/estruturas.h"
 
 void telaJogo()
 {
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
     processaEventosJogo(&jogador, &e);
     renderiza();
 }
@@ -25,7 +24,7 @@ int telaSelecaoPersonagem(Jogador *jogador)
 
     while (menu)
     {
-        SDL_SetRenderDrawColor(renderizador, 150, 150, 150, 255);
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         SDL_RenderClear(renderizador);
 
         // Desenhar a moldura externa (marrom)
@@ -39,18 +38,18 @@ int telaSelecaoPersonagem(Jogador *jogador)
         // Desenhar a imagem do personagem selecionado
         SDL_RenderCopy(renderizador, personagens[selecao], NULL, &imagemRect);
 
-        escreveTexto("Raposa", 500, 200, PRETO);
-        escreveTexto("Esquilo", 500, 250, PRETO);
+        escreveTexto("Raposa", 500, 200, BRANCO);
+        escreveTexto("Esquilo", 500, 250, BRANCO);
 
         exibeFichas(jogador->fichas);
 
         switch (selecao)
         {
         case 0:
-            escreveTexto("Raposa", 500, 200, BRANCO);
+            escreveTexto("Raposa", 500, 200, AMARELO);
             break;
         case 1:
-            escreveTexto("Esquilo", 500, 250, BRANCO);
+            escreveTexto("Esquilo", 500, 250, AMARELO);
             break;
         }
         while (SDL_PollEvent(&e))
@@ -152,7 +151,7 @@ void telaRecordes() // OK
 void telaPause() // OK
 {
     int pause = 1;
-    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, PRETO);
+    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
     SDL_RenderPresent(renderizador);
     while (pause)
     {
@@ -369,22 +368,22 @@ void telaInicial(Jogador *jogador) // OK
     {
         SDL_SetRenderDrawColor(renderizador, 0, 0, 200, 255);
         SDL_RenderClear(renderizador);
-        escreveTexto("Iniciar", 200, 200, PRETO);
-        escreveTexto("Instrucoes", 200, 250, PRETO);
-        escreveTexto("Recordes", 200, 300, PRETO);
+        escreveTexto("Iniciar", 200, 200, BRANCO);
+        escreveTexto("Instrucoes", 200, 250, BRANCO);
+        escreveTexto("Recordes", 200, 300, BRANCO);
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
         exibeFichas(jogador->fichas);
 
         switch (selecao)
         {
         case 0:
-            escreveTexto("Iniciar", 200, 200, BRANCO);
+            escreveTexto("Iniciar", 200, 200, AMARELO);
             break;
         case 1:
-            escreveTexto("Instrucoes", 200, 250, BRANCO);
+            escreveTexto("Instrucoes", 200, 250, AMARELO);
             break;
         case 2:
-            escreveTexto("Recordes", 200, 300, BRANCO);
+            escreveTexto("Recordes", 200, 300, AMARELO);
             break;
         }
 

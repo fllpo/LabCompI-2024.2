@@ -1,12 +1,19 @@
 #ifndef NPC_H
 #define NPC_H
 
-#include "utils.h"
-#include "estruturas.h"
+#include "jogador.h"
 
-extern Npc npc;
-bool iniciaNPC(Npc *npc);
-void atualizaNPC(Npc *inimigo, Jogador *jogador);
-void desenhaNPC(Npc *inimigo);
+extern Npc *npc;
+extern int num_npcs;
+
+bool criaNPCs(int quantidade);
+bool iniciaNPC(Npc *npc, int index);
+void desenhaNPC(Npc *npc);
+void atualizaNPC(Npc *npc, Jogador *jogador);
+void atualizaTodosNPCs(Jogador *jogador);
+void desenhaTodosNPCs(void);
 void colisaoJogadorNPC(Jogador *jogador, Npc *npc);
+void verificaTodasColisoesNPC(Jogador *jogador);
+void liberaNPCs(void);
+
 #endif

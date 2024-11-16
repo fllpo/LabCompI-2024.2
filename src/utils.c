@@ -76,31 +76,24 @@ void destroi(SDL_Window *janela)
 
 void renderiza()
 {
-    // Limpa o renderizador uma vez por frame
-    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
     SDL_RenderClear(renderizador);
 
-    // Atualiza as posições dos objetos
     atualizaJogador(&jogador);
-    atualizaInimigo(&inimigo, &jogador);
-    atualizaNPC(&npc, &jogador);
+    atualizaTodosInimigos(&jogador);
+    atualizaTodosNPCs(&jogador);
 
-    // Renderiza todos os elementos
     desenhaCenario();
-
-    desenhaInimigo(&inimigo);
+    desenhaTodosInimigos();
     desenhaJogador(&jogador, idle, run, jump);
-    desenhaNPC(&npc);
+    desenhaTodosNPCs();
 
-    // Exibe informações na tela
+    verificaTodasColisoesNPC(&jogador);
+    verificaTodasColisoesInimigo(&jogador);
 
     exibeVida(jogador.vida);
     exibePontos(jogador.pontos);
 
-    // Apresenta o frame completo
     SDL_RenderPresent(renderizador);
-
-    // Controle de FPS
     limitaFPS();
 }
 
@@ -172,21 +165,64 @@ void exibePontos(int pontos)
 {
     char texto[30];
     sprintf(texto, "Pontos:%d", pontos);
-    escreveTexto(texto, TELA_LARGURA - 200, 10, PRETO);
+    escreveTexto(texto, TELA_LARGURA - 200, 10, BRANCO);
 }
 void exibeVida(int vida)
 {
     char texto[50];
     sprintf(texto, "Vida: %d", vida);
-    escreveTexto(texto, 10, 10, PRETO);
+    escreveTexto(texto, 10, 10, BRANCO);
 }
 void escreveTexto(char *texto, int x, int y, SDL_Color cor)
 {
-    SDL_Surface *textoSuperficie = TTF_RenderText_Solid(fonte, texto, cor);
-    SDL_Texture *textoTextura = SDL_CreateTextureFromSurface(renderizador, textoSuperficie);
-    SDL_Rect textoPosicao = {x, y, 0, 0};
-    SDL_FreeSurface(textoSuperficie);
-    SDL_QueryTexture(textoTextura, NULL, NULL, &textoPosicao.w, &textoPosicao.h);
-    SDL_RenderCopy(renderizador, textoTextura, NULL, &textoPosicao);
-    SDL_DestroyTexture(textoTextura);
+    // Renderiza o texto preto para a borda
+    SDL_Surface *textoPreto = TTF_RenderText_Solid(fonte, texto, PRETO);
+    SDL_Texture *texturaPreto = SDL_CreateTextureFromSurface(renderizador, textoPreto);
+    SDL_Rect posicaoPreto = {x - 1, y - 1, 0, 0};
+    SDL_QueryTexture(texturaPreto, NULL, NULL, &posicaoPreto.w, &posicaoPreto.h);
+
+    SDL_Rect bordas[8] = {
+        {x - 1, y - 1, posicaoPreto.w, posicaoPreto.h},
+        {x + 1, y - 1, posicaoPreto.w, posicaoPreto.h},
+        {x - 1, y + 1, posicaoPreto.w, posicaoPreto.h},
+        {x + 1, y + 1, posicaoPreto.w, posicaoPreto.h},
+        {x, y - 1, posicaoPreto.w, posicaoPreto.h},
+        {x, y + 1, posicaoPreto.w, posicaoPreto.h},
+        {x - 1, y, posicaoPreto.w, posicaoPreto.h},
+        {x + 1, y, posicaoPreto.w, posicaoPreto.h}};
+
+    for (int i = 0; i < 8; i++)
+    {
+        SDL_RenderCopy(renderizador, texturaPreto, NULL, &bordas[i]);
+    }
+
+    SDL_Surface *textoBranco = TTF_RenderText_Solid(fonte, texto, cor);
+    SDL_Texture *texturaBranco = SDL_CreateTextureFromSurface(renderizador, textoBranco);
+    SDL_Rect posicaoBranco = {x, y, posicaoPreto.w, posicaoPreto.h};
+    SDL_RenderCopy(renderizador, texturaBranco, NULL, &posicaoBranco);
+
+    // Libera os recursos
+    SDL_FreeSurface(textoPreto);
+    SDL_FreeSurface(textoBranco);
+    SDL_DestroyTexture(texturaPreto);
+    SDL_DestroyTexture(texturaBranco);
+}
+
+bool verificaColisaoComPlataformas(Jogador *jogador, Plataforma *plataformas, int numPlataformas)
+{
+    for (int i = 0; i < numPlataformas; i++)
+    {
+        if (jogador->x + jogador->w > plataformas[i].x &&
+            jogador->x < plataformas[i].x + plataformas[i].w &&
+            jogador->y + jogador->h > plataformas[i].y &&
+            jogador->y < plataformas[i].y + plataformas[i].h)
+        {
+            jogador->nochao = true;
+            jogador->pulando = false;
+            jogador->velocidadeY = 0;
+            jogador->y = plataformas[i].y - jogador->h;
+            return true;
+        }
+    }
+    return false;
 }

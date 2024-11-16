@@ -1,4 +1,4 @@
-#include "../include/utils_recordes.h"
+#include "../include/recordes.h"
 void gravarRecordes(char *nomeJogador, int maiorPonto)
 {
     Recorde recordes[MAX_REGISTROS];

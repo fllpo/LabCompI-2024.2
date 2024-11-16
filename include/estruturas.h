@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-// Estrutura do jogador
 typedef struct
 {
     float x, y, w, h, scrollX, velocidadeY, velocidade_movimento, forca_salto;
@@ -13,7 +12,6 @@ typedef struct
 
 } Jogador;
 
-// Estrutura do inimigo
 typedef struct
 {
     float x, y, w, h, velocidadeY, velocidade_movimento;
@@ -21,13 +19,19 @@ typedef struct
     bool ativo, nochao, pulando;
 
 } Inimigo;
-
-// Estrutura do NPC
 typedef struct
 {
-    float x, y, w, h, velocidade_movimento, velocidadeY;
-    int viradoParaEsquerda;
-    bool resgatado, nochao, pulando;
+    float x, y;
+    float velocidadeY;
+    int w, h;
+    bool viradoParaEsquerda;
+    bool pulando;
+    bool nochao;
+    float velocidade_movimento;
+    bool resgatado;
 } Npc;
-
+typedef struct
+{
+    int x, y, w, h;
+} Plataforma;
 #endif

@@ -1,5 +1,5 @@
-#ifndef UTILS_RECORDES_H
-#define UTILS_RECORDES_H
+#ifndef RECORDES_H
+#define RECORDES_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
