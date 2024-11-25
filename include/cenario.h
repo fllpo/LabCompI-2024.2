@@ -9,5 +9,4 @@ typedef struct
 
 static Tileset tileset;
 void desenhaCenario();
-void criaPlataforma(int x, int y, int tamanho);
 #endif

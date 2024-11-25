@@ -31,7 +31,6 @@ bool criaNPCs(int quantidade)
 bool iniciaNPC(Npc *npc, int index)
 {
     npc->viradoParaEsquerda = 0;
-    npc->pulando = true;
     npc->h = 50;
     npc->w = 50;
     npc->x = TELA_LARGURA - (200 * (index + 1));
@@ -40,6 +39,7 @@ bool iniciaNPC(Npc *npc, int index)
     npc->velocidade_movimento = 200;
     npc->resgatado = false;
     npc->nochao = true;
+    npc->posicao_fila = -1;
     return true;
 }
 
@@ -79,7 +79,7 @@ void liberaNPCs()
 
 void atualizaNPC(Npc *npc, Jogador *jogador)
 {
-    int posicao_fila = 0;
+    npc->posicao_fila = 0;
     if (npc->resgatado)
     {
         for (int i = 0; i < num_npcs; i++)
@@ -90,7 +90,7 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
             }
             if (npc[i].resgatado)
             {
-                posicao_fila++;
+                npc->posicao_fila++;
             }
         }
     }
@@ -98,30 +98,30 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
     if (npc->resgatado)
     {
 
-        float alvo_x;
+        float posicao_x;
 
         if (jogador->viradoParaEsquerda)
         {
-            alvo_x = jogador->x + 70;
+            posicao_x = jogador->x + 70;
         }
         else
         {
-            alvo_x = jogador->x - 50;
+            posicao_x = jogador->x - 50;
         }
 
-        if (npc->x + 20 < alvo_x)
+        if (npc->x + 20 < posicao_x)
         {
             npc->x += jogador->velocidade_movimento * deltaTime;
             npc->viradoParaEsquerda = 0;
         }
-        if (npc->x - 20 > alvo_x)
+        if (npc->x - 20 > posicao_x)
         {
             npc->x -= jogador->velocidade_movimento * deltaTime;
             npc->viradoParaEsquerda = 1;
         }
 
         // Pulo e queda
-        if (jogador->pulando || !jogador->nochao)
+        if (!jogador->nochao)
         {
             npc->y += jogador->velocidadeY;
             npc->velocidadeY += GRAVIDADE;
@@ -129,7 +129,6 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
             if (npc->y >= TELA_ALTURA - npc->h - 50)
             {
                 npc->y = TELA_ALTURA - npc->h - 50;
-                npc->pulando = false;
                 npc->nochao = true;
                 npc->velocidadeY = 0;
             }
@@ -147,7 +146,6 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
         if (npc->y >= TELA_ALTURA - npc->h - 10)
         {
             npc->y = TELA_ALTURA - npc->h - 10;
-            npc->pulando = false;
             npc->nochao = true;
             npc->velocidadeY = 0;
         }

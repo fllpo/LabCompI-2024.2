@@ -3,9 +3,12 @@
 #include "../include/inimigo.h"
 #include "../include/npc.h"
 #include "../include/estruturas.h"
+#include "../include/cenario.h"
 
 Jogador jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
-Inimigo inimigo;
+extern int qtd_plataformas;
+extern Plataforma plataformas[];
+extern Porta porta;
 
 bool iniciaJogador(Jogador *jogador, int selecao)
 {
@@ -14,7 +17,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
     jogador->movDireita = false;
     jogador->viradoParaEsquerda = 0;
     jogador->movEsquerda = false;
-    jogador->pulando = true;
+
     jogador->x = TELA_LARGURA / 2 - jogador->w;
     jogador->scrollX = 0;
     jogador->y = TELA_ALTURA / 2 - jogador->h;
@@ -98,10 +101,62 @@ bool iniciaJogador(Jogador *jogador, int selecao)
 
     return true;
 }
-
-void atualizaJogador(Jogador *jogador)
+void aplicarGravidade(Jogador *jogador)
 {
-    // Movimento horizontal
+    jogador->y += jogador->velocidadeY;
+    jogador->velocidadeY += GRAVIDADE;
+    jogador->nochao = false;
+}
+
+bool verificarColisaoPlataformas(Jogador *jogador)
+{
+    for (int i = 0; i < qtd_plataformas; i++)
+    {
+        if (jogador->x + jogador->w > plataformas[i].x &&
+            jogador->x < plataformas[i].x + plataformas[i].w &&
+            jogador->y + jogador->h > plataformas[i].y &&
+            jogador->y < plataformas[i].y + plataformas[i].h)
+        {
+            jogador->velocidadeY = 0;
+            jogador->y = plataformas[i].y - jogador->h;
+            jogador->nochao = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+void verificarColisaoChao(Jogador *jogador)
+{
+    if (jogador->y >= TELA_ALTURA - jogador->h - 50)
+    {
+        jogador->y = TELA_ALTURA - jogador->h - 50;
+        jogador->velocidadeY = 0;
+        jogador->nochao = true;
+    }
+}
+
+void movimentoVertical(Jogador *jogador)
+{
+    if (jogador->vida == 0)
+    {
+        aplicarGravidade(jogador);
+    }
+    else
+    {
+        bool em_plataforma = verificarColisaoPlataformas(jogador);
+        jogador->nochao = em_plataforma;
+
+        if (!jogador->nochao)
+        {
+            aplicarGravidade(jogador);
+        }
+        verificarColisaoChao(jogador);
+    }
+}
+
+void movimentoHorizontal(Jogador *jogador)
+{
     if (jogador->movDireita)
     {
         jogador->x += jogador->velocidade_movimento * deltaTime;
@@ -112,34 +167,39 @@ void atualizaJogador(Jogador *jogador)
         jogador->x -= jogador->velocidade_movimento * deltaTime;
         jogador->viradoParaEsquerda = 1;
     }
+
     jogador->scrollX = -jogador->x + TELA_LARGURA / 2 - jogador->w;
+
     if (jogador->scrollX > 0)
     {
         jogador->scrollX = 0;
     }
-
-    // Pulo e queda
-    if (jogador->pulando || !jogador->nochao)
+    if (jogador->scrollX < -16 * 300)
     {
-        jogador->y += jogador->velocidadeY;
-        jogador->velocidadeY += GRAVIDADE;
-
-        if (jogador->y >= TELA_ALTURA - jogador->h - 50)
-        {
-            jogador->y = TELA_ALTURA - jogador->h - 50;
-            jogador->pulando = false;
-            jogador->nochao = true;
-            jogador->velocidadeY = 0;
-        }
+        jogador->scrollX = -16 * 300;
     }
+
+    // colisão com porta
+    if (jogador->x + jogador->w > porta.x &&
+        jogador->x < porta.x + porta.w &&
+        jogador->y + jogador->h > porta.y &&
+        jogador->y < porta.y + porta.h && jogador->pontos >= num_npcs * 100)
+    {
+        // Conta os pontos, ganha o jogo
+    }
+}
+void atualizaJogador(Jogador *jogador)
+{
+    movimentoHorizontal(jogador);
+    movimentoVertical(jogador);
 }
 
 void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
 {
     SDL_Rect rectJogador = {jogador->x + jogador->scrollX, jogador->y, jogador->w, jogador->h};
-
     SDL_Texture *texturaAtual;
-    if (jogador->pulando || !jogador->nochao)
+
+    if (!jogador->nochao)
     {
         texturaAtual = (jogador->velocidadeY > 0) ? jump[1] : jump[0];
     }
@@ -149,7 +209,10 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
     else
     {
-        texturaAtual = idle[SDL_GetTicks() / 300 % 4];
+        if (jogador->velocidadeY == 0)
+        {
+            texturaAtual = idle[SDL_GetTicks() / 300 % 4];
+        }
     }
 
     jogador->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectJogador);

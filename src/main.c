@@ -45,6 +45,7 @@ void executarLoopJogo()
 
         gerenciarFrame(frameStart);
     }
+    SDL_Delay(2000);
 }
 
 void limparRecursos()
@@ -79,6 +80,7 @@ int main(int argc, char *args[])
         }
 
         executarLoopJogo();
+
         telaFinal(&jogador);
     }
 

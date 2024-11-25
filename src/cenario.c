@@ -4,6 +4,13 @@
 
 extern Jogador jogador;
 
+Plataforma plataformas[] = {
+    {450, TELA_ALTURA - 200, 150, 50},
+    {750, TELA_ALTURA - 400, 250, 50}};
+
+Porta porta = {2000, TELA_ALTURA - 250, 100, 200};
+int qtd_plataformas = sizeof(plataformas) / sizeof(Plataforma);
+
 void inicializaTileset()
 {
     tileset.texture = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/tileset.png");
@@ -16,25 +23,24 @@ void inicializaTileset()
         }
     }
 }
-
-void desenhaCenario()
+void criaChao(int tamanho)
 {
-    inicializaTileset();
-    SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
-    SDL_RenderCopy(renderizador, fundo, NULL, NULL);
-    SDL_DestroyTexture(fundo);
-
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < tamanho; i++)
     {
         SDL_Rect rectChao = {50 * i + jogador.scrollX, TELA_ALTURA - 50, 50, 50};
         SDL_RenderCopy(renderizador, tileset.texture, &tileset.tiles[3][1], &rectChao);
     }
+}
 
-    Plataforma plataformas[2];
-    plataformas[0] = (Plataforma){450, TELA_ALTURA - 200, 150, 50};
-    plataformas[1] = (Plataforma){750, TELA_ALTURA - 400, 250, 50};
-
-    for (int i = 0; i < 2; i++)
+void criaPorta(Porta *porta)
+{
+    SDL_Rect rectPorta = {porta->x + jogador.scrollX, porta->y, porta->h, porta->w};
+    SDL_SetRenderDrawColor(renderizador, 139, 69, 19, 255);
+    SDL_RenderFillRect(renderizador, &rectPorta);
+}
+void criaPlataformas()
+{
+    for (int i = 0; i < qtd_plataformas; i++)
     {
         for (int j = 0; j < plataformas[i].w / 50; j++)
         {
@@ -55,8 +61,22 @@ void desenhaCenario()
             SDL_RenderCopy(renderizador, tileset.texture, tilesPlataforma, &plataformasRect);
         }
     }
+}
 
-    verificaColisaoComPlataformas(&jogador, plataformas, 2);
+void teste()
+{
+    return;
+}
+void desenhaCenario()
+{
+    inicializaTileset();
+    SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
+    SDL_RenderCopy(renderizador, fundo, NULL, NULL);
 
+    criaPorta(&porta);
+    criaChao(178);
+    criaPlataformas();
+
+    SDL_DestroyTexture(fundo);
     SDL_DestroyTexture(tileset.texture);
 }

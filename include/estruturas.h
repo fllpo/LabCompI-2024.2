@@ -8,7 +8,7 @@ typedef struct
 {
     float x, y, w, h, scrollX, velocidadeY, velocidade_movimento, forca_salto;
     int vida, pontos, fichas, recorde, viradoParaEsquerda, num_jump, num_idle, num_run;
-    bool pulando, nochao, imune, resgatando, movDireita, movEsquerda;
+    bool nochao, imune, resgatando, movDireita, movEsquerda, pulando;
 
 } Jogador;
 
@@ -21,17 +21,17 @@ typedef struct
 } Inimigo;
 typedef struct
 {
-    float x, y;
-    float velocidadeY;
-    int w, h;
-    bool viradoParaEsquerda;
-    bool pulando;
-    bool nochao;
-    float velocidade_movimento;
-    bool resgatado;
+    int w, h, posicao_fila;
+    float x, y, velocidadeY, velocidade_movimento;
+    bool viradoParaEsquerda, nochao, resgatado;
 } Npc;
 typedef struct
 {
     int x, y, w, h;
 } Plataforma;
+typedef struct
+{
+    int x, y, w, h;
+} Porta;
+
 #endif

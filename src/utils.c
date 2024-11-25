@@ -122,9 +122,6 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
             case SDLK_ESCAPE:
                 telaPause();
                 break;
-            case SDLK_c:
-                jogador->vida--;
-                break;
             case SDLK_d:
                 jogador->movDireita = true;
                 break;
@@ -132,9 +129,8 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
                 jogador->movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (!jogador->pulando && jogador->nochao)
+                if (jogador->nochao)
                 {
-                    jogador->pulando = true;
                     jogador->nochao = false;
                     jogador->velocidadeY = jogador->forca_salto;
                 }
@@ -206,23 +202,4 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_FreeSurface(textoBranco);
     SDL_DestroyTexture(texturaPreto);
     SDL_DestroyTexture(texturaBranco);
-}
-
-bool verificaColisaoComPlataformas(Jogador *jogador, Plataforma *plataformas, int numPlataformas)
-{
-    for (int i = 0; i < numPlataformas; i++)
-    {
-        if (jogador->x + jogador->w > plataformas[i].x &&
-            jogador->x < plataformas[i].x + plataformas[i].w &&
-            jogador->y + jogador->h > plataformas[i].y &&
-            jogador->y < plataformas[i].y + plataformas[i].h)
-        {
-            jogador->nochao = true;
-            jogador->pulando = false;
-            jogador->velocidadeY = 0;
-            jogador->y = plataformas[i].y - jogador->h;
-            return true;
-        }
-    }
-    return false;
 }
