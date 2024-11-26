@@ -6,6 +6,7 @@
 
 extern Inimigo *inimigos;
 extern int num_inimigos;
+SDL_Texture **inimigo_textura;
 
 bool criaInimigos(int quantidade);
 bool iniciaInimigo(Inimigo *inimigo, int index);

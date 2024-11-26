@@ -31,8 +31,8 @@ bool criaInimigos(int quantidade)
 bool iniciaInimigo(Inimigo *inimigo, int index)
 {
     inimigo->vida = 1;
-    inimigo->h = 50;
-    inimigo->w = 50;
+    inimigo->h = 100;
+    inimigo->w = 100;
     inimigo->x = TELA_LARGURA - (200 * (index + 1));
     inimigo->y = TELA_ALTURA - inimigo->h - 50;
     inimigo->viradoParaEsquerda = 0;
@@ -40,6 +40,22 @@ bool iniciaInimigo(Inimigo *inimigo, int index)
     inimigo->velocidadeY = 0;
     inimigo->velocidade_movimento = 200;
     inimigo->nochao = true;
+
+    // Carregando texturas
+    char caminho[256];
+    inimigo_textura = (SDL_Texture **)malloc(3 * sizeof(SDL_Texture *));
+    for (int i = 0; i < 4; i++)
+    {
+        snprintf(caminho, sizeof(caminho), "assets/img/Characters/Enemies and NPC/Dog/Sprites/Dog/dog%d.png", i + 1);
+
+        inimigo_textura[i] = IMG_LoadTexture(renderizador, caminho);
+        if (inimigo_textura[i] == NULL)
+        {
+            printf("Erro ao carregar textura %d para bunny: %s\n", i + 1, IMG_GetError());
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -110,8 +126,18 @@ void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
 void desenhaInimigo(Inimigo *inimigo)
 {
     SDL_Rect rectInimigo = {inimigo->x + jogador.scrollX, inimigo->y, inimigo->w, inimigo->h};
-    SDL_SetRenderDrawColor(renderizador, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderizador, &rectInimigo);
+    SDL_Texture *texturaAtual;
+
+    /*if (!jogador.nochao)
+    {
+        texturaAtual = (inimigo->velocidadeY > 0) ? inimigo_textura[1] : inimigo_textura[2];
+    }*/
+    if (inimigo->velocidade_movimento != 0)
+    {
+        texturaAtual = inimigo_textura[SDL_GetTicks() / 150 % 4];
+    }
+
+    !inimigo->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectInimigo, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectInimigo);
 }
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
