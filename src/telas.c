@@ -152,6 +152,7 @@ void telaPause() // OK
 {
     int pause = 1;
     escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
+
     SDL_RenderPresent(renderizador);
     while (pause)
     {

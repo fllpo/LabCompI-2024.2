@@ -5,9 +5,9 @@
 #include "estruturas.h"
 extern Jogador jogador;
 
-SDL_Texture **idle;
-SDL_Texture **run;
-SDL_Texture **jump;
+static SDL_Texture **idle = NULL;
+static SDL_Texture **run = NULL;
+static SDL_Texture **jump = NULL;
 
 void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump);
 bool iniciaJogador(Jogador *jogador, int selecao);

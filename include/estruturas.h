@@ -8,7 +8,7 @@ typedef struct
 {
     float x, y, w, h, scrollX, velocidadeY, velocidade_movimento, forca_salto;
     int vida, pontos, fichas, recorde, viradoParaEsquerda, num_jump, num_idle, num_run;
-    bool nochao, imune, resgatando, movDireita, movEsquerda, pulando;
+    bool nochao, imune, resgatando, movDireita, movEsquerda, salta;
 
 } Jogador;
 

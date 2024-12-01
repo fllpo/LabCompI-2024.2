@@ -10,20 +10,17 @@ bool criaNPCs(int quantidade)
     if (npc != NULL)
     {
         free(npc);
+        npc = NULL;
     }
 
-    npc = (Npc *)malloc(quantidade * sizeof(Npc));
+    npc = (Npc *)calloc(quantidade, sizeof(Npc));
     if (npc == NULL)
-    {
         return false;
-    }
 
     num_npcs = quantidade;
 
     for (int i = 0; i < num_npcs; i++)
-    {
         iniciaNPC(&npc[i], i);
-    }
 
     return true;
 }
@@ -43,7 +40,7 @@ bool iniciaNPC(Npc *npc, int index)
 
     // Carregando texturas
     char caminho[256];
-    npc_textura = (SDL_Texture **)malloc(3 * sizeof(SDL_Texture *));
+    npc_textura = (SDL_Texture **)calloc(3, sizeof(SDL_Texture *));
     for (int i = 0; i < 3; i++)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Enemies and NPC/bunny/sprites/bunny%d.png", i + 1);

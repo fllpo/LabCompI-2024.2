@@ -57,15 +57,12 @@ void destroi(SDL_Window *janela)
 
     for (int i = 0; i < 6; i++)
     {
-        SDL_DestroyTexture(run[i]);
-        if (i < 4)
-        {
+        if (run[i])
+            SDL_DestroyTexture(run[i]);
+        if (i < 4 && idle[i])
             SDL_DestroyTexture(idle[i]);
-            if (i < 2)
-            {
-                SDL_DestroyTexture(jump[i]);
-            }
-        }
+        if (i < 2 && jump[i])
+            SDL_DestroyTexture(jump[i]);
     }
 
     TTF_CloseFont(fonte);
@@ -129,11 +126,7 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
                 jogador->movEsquerda = true;
                 break;
             case SDLK_SPACE:
-                if (jogador->nochao)
-                {
-                    jogador->nochao = false;
-                    jogador->velocidadeY = jogador->forca_salto;
-                }
+                jogador->salta = true;
                 break;
             }
         }

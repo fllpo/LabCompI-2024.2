@@ -12,7 +12,7 @@ bool criaInimigos(int quantidade)
         free(inimigos);
     }
 
-    inimigos = (Inimigo *)malloc(quantidade * sizeof(Inimigo));
+    inimigos = (Inimigo *)calloc(quantidade, sizeof(Inimigo));
     if (inimigos == NULL)
     {
         return false;
@@ -43,7 +43,7 @@ bool iniciaInimigo(Inimigo *inimigo, int index)
 
     // Carregando texturas
     char caminho[256];
-    inimigo_textura = (SDL_Texture **)malloc(3 * sizeof(SDL_Texture *));
+    inimigo_textura = (SDL_Texture **)calloc(4, sizeof(SDL_Texture *));
     for (int i = 0; i < 4; i++)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Enemies and NPC/Dog/Sprites/Dog/dog%d.png", i + 1);
@@ -128,16 +128,20 @@ void desenhaInimigo(Inimigo *inimigo)
     SDL_Rect rectInimigo = {inimigo->x + jogador.scrollX, inimigo->y, inimigo->w, inimigo->h};
     SDL_Texture *texturaAtual;
 
-    /*if (!jogador.nochao)
-    {
-        texturaAtual = (inimigo->velocidadeY > 0) ? inimigo_textura[1] : inimigo_textura[2];
-    }*/
     if (inimigo->velocidade_movimento != 0)
     {
         texturaAtual = inimigo_textura[SDL_GetTicks() / 150 % 4];
     }
 
     !inimigo->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectInimigo, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectInimigo);
+}
+
+void tornaJogadorMortal(Jogador *jogador)
+{
+    if (jogador->imune == true)
+    {
+        jogador->imune = false;
+    }
 }
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
@@ -152,6 +156,9 @@ void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
         else if (jogador->resgatando == true)
         {
             jogador->resgatando = false;
+
+            // jogador->imune = true;
+            // SDL_TimerID timerId = SDL_AddTimer(2000, tornaJogadorMortal, jogador);
         }
     }
 }

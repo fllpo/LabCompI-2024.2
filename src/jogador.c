@@ -9,7 +9,39 @@ Jogador jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
 extern int qtd_plataformas;
 extern Plataforma plataformas[];
 extern Porta porta;
-
+void liberaJogador(Jogador *jogador)
+{
+    if (idle)
+    {
+        for (int i = 0; i < jogador->num_idle; i++)
+        {
+            if (idle[i])
+                SDL_DestroyTexture(idle[i]);
+        }
+        free(idle);
+        idle = NULL;
+    }
+    if (run)
+    {
+        for (int i = 0; i < jogador->num_run; i++)
+        {
+            if (run[i])
+                SDL_DestroyTexture(run[i]);
+        }
+        free(run);
+        run = NULL;
+    }
+    if (jump)
+    {
+        for (int i = 0; i < jogador->num_jump; i++)
+        {
+            if (jump[i])
+                SDL_DestroyTexture(jump[i]);
+        }
+        free(jump);
+        jump = NULL;
+    }
+}
 bool iniciaJogador(Jogador *jogador, int selecao)
 {
     jogador->vida = 1;
@@ -53,12 +85,13 @@ bool iniciaJogador(Jogador *jogador, int selecao)
 
     char caminho[256];
 
-    idle = (SDL_Texture **)malloc(jogador->num_idle * sizeof(SDL_Texture *));
-    run = (SDL_Texture **)malloc(jogador->num_run * sizeof(SDL_Texture *));
-    jump = (SDL_Texture **)malloc(jogador->num_jump * sizeof(SDL_Texture *));
+    idle = (SDL_Texture **)calloc(jogador->num_idle, sizeof(SDL_Texture *));
+    run = (SDL_Texture **)calloc(jogador->num_run, sizeof(SDL_Texture *));
+    jump = (SDL_Texture **)calloc(jogador->num_jump, sizeof(SDL_Texture *));
 
     if (!idle || !run || !jump)
     {
+        liberaJogador(jogador);
         printf("Erro na alocação de memória para as texturas\n");
         return false;
     }
@@ -70,6 +103,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
         idle[i] = IMG_LoadTexture(renderizador, caminho);
         if (idle[i] == NULL)
         {
+            liberaJogador(jogador);
             printf("Erro ao carregar textura idle %d para %s: %s\n", i + 1, personagem, IMG_GetError());
             return false;
         }
@@ -82,6 +116,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
         run[i] = IMG_LoadTexture(renderizador, caminho);
         if (run[i] == NULL)
         {
+            liberaJogador(jogador);
             printf("Erro ao carregar textura run %d para %s: %s\n", i + 1, personagem, IMG_GetError());
             return false;
         }
@@ -94,6 +129,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
         jump[i] = IMG_LoadTexture(renderizador, caminho);
         if (jump[i] == NULL)
         {
+            liberaJogador(jogador);
             printf("Erro ao carregar textura jump %d para %s: %s\n", i + 1, personagem, IMG_GetError());
             return false;
         }
@@ -114,45 +150,54 @@ bool verificarColisaoPlataformas(Jogador *jogador)
     {
         if (jogador->x + jogador->w > plataformas[i].x &&
             jogador->x < plataformas[i].x + plataformas[i].w &&
-            jogador->y + jogador->h > plataformas[i].y &&
-            jogador->y < plataformas[i].y + plataformas[i].h)
+            jogador->y + jogador->h >= plataformas[i].y &&
+            jogador->y + jogador->h <= plataformas[i].y + 10)
         {
             jogador->velocidadeY = 0;
             jogador->y = plataformas[i].y - jogador->h;
             jogador->nochao = true;
+
             return true;
         }
+    }
+    jogador->nochao = false;
+    return false;
+}
+
+void jogadorSalta(Jogador *jogador)
+{
+    if (jogador->salta)
+    {
+        if (jogador->nochao || verificarColisaoPlataformas(jogador))
+        {
+            jogador->velocidadeY = jogador->forca_salto;
+            jogador->nochao = false;
+        }
+        jogador->salta = false;
+    }
+}
+
+bool verificarColisaoChao(Jogador *jogador)
+{
+    if (jogador->y >= TELA_ALTURA - jogador->h - 50)
+    {
+        jogador->velocidadeY = 0;
+        jogador->y = TELA_ALTURA - jogador->h - 50;
+        jogador->nochao = true;
+        return true;
     }
     return false;
 }
 
-void verificarColisaoChao(Jogador *jogador)
-{
-    if (jogador->y >= TELA_ALTURA - jogador->h - 50)
-    {
-        jogador->y = TELA_ALTURA - jogador->h - 50;
-        jogador->velocidadeY = 0;
-        jogador->nochao = true;
-    }
-}
-
 void movimentoVertical(Jogador *jogador)
 {
-    if (jogador->vida == 0)
-    {
-        aplicarGravidade(jogador);
-    }
-    else
-    {
-        bool em_plataforma = verificarColisaoPlataformas(jogador);
-        jogador->nochao = em_plataforma;
 
-        if (!jogador->nochao)
-        {
-            aplicarGravidade(jogador);
-        }
-        verificarColisaoChao(jogador);
-    }
+    jogadorSalta(jogador);
+
+    if (!verificarColisaoPlataformas(jogador))
+        aplicarGravidade(jogador);
+
+    verificarColisaoChao(jogador);
 }
 
 void movimentoHorizontal(Jogador *jogador)
@@ -216,25 +261,4 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
 
     jogador->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectJogador);
-}
-
-void liberaJogador(Jogador *jogador)
-{
-    for (int i = 0; i < jogador->num_idle; i++)
-    {
-        SDL_DestroyTexture(idle[i]);
-    }
-    free(idle);
-
-    for (int i = 0; i < jogador->num_run; i++)
-    {
-        SDL_DestroyTexture(run[i]);
-    }
-    free(run);
-
-    for (int i = 0; i < jogador->num_jump; i++)
-    {
-        SDL_DestroyTexture(jump[i]);
-    }
-    free(jump);
 }

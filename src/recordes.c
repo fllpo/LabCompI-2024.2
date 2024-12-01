@@ -30,10 +30,17 @@ int carregarRecordes(Recorde *recordes)
 
 void adicionarNovoRecorde(Recorde *recordes, int *numRecordes, char *nomeJogador, int maiorPonto)
 {
-    strncpy(recordes[*numRecordes].nome, nomeJogador, sizeof(recordes[*numRecordes].nome) - 1);
-    recordes[*numRecordes].nome[sizeof(recordes[*numRecordes].nome) - 1] = '\0';
-    recordes[*numRecordes].pontos = maiorPonto;
-    (*numRecordes)++;
+    if (*numRecordes < MAX_REGISTROS)
+    {
+        strncpy(recordes[*numRecordes].nome, nomeJogador, sizeof(recordes[*numRecordes].nome) - 1);
+        recordes[*numRecordes].nome[sizeof(recordes[*numRecordes].nome) - 1] = '\0';
+        recordes[*numRecordes].pontos = maiorPonto;
+        (*numRecordes)++;
+    }
+    else
+    {
+        fprintf(stderr, "Não é possível adicionar mais recordes. Limite atingido.\n");
+    }
 }
 
 void ordenarRecordes(Recorde *recordes, int numRecordes)
