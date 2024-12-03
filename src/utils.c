@@ -140,6 +140,9 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
             case SDLK_a:
                 jogador->movEsquerda = false;
                 break;
+            case SDLK_SPACE:
+                jogador->salta = false;
+                break;
             }
         }
     }

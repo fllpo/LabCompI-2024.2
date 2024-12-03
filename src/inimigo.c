@@ -41,7 +41,6 @@ bool iniciaInimigo(Inimigo *inimigo, int index)
     inimigo->velocidade_movimento = 200;
     inimigo->nochao = true;
 
-    // Carregando texturas
     char caminho[256];
     inimigo_textura = (SDL_Texture **)calloc(4, sizeof(SDL_Texture *));
     for (int i = 0; i < 4; i++)
@@ -51,7 +50,7 @@ bool iniciaInimigo(Inimigo *inimigo, int index)
         inimigo_textura[i] = IMG_LoadTexture(renderizador, caminho);
         if (inimigo_textura[i] == NULL)
         {
-            printf("Erro ao carregar textura %d para bunny: %s\n", i + 1, IMG_GetError());
+            printf("Erro ao carregar textura %d para dog: %s\n", i + 1, IMG_GetError());
             return false;
         }
     }
@@ -93,34 +92,54 @@ void liberaInimigos()
     }
 }
 
-void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
+void movimentoHorizontalInimigo(Inimigo *inimigo, Jogador *jogador)
 {
-    // Movimento horizontal
-    if (inimigo->x < jogador->x)
+    int direcao = inimigo->viradoParaEsquerda ? -1 : 1;
+    float distancia = abs(inimigo->x - jogador->x);
+
+    if (distancia > 400)
     {
-        inimigo->x += inimigo->velocidade_movimento * deltaTime;
-        inimigo->viradoParaEsquerda = 0;
-    }
-    if (inimigo->x > jogador->x)
-    {
-        inimigo->x -= inimigo->velocidade_movimento * deltaTime;
-        inimigo->viradoParaEsquerda = 1;
+        if (inimigo->x < jogador->x)
+        {
+            direcao = 1;
+            inimigo->viradoParaEsquerda = 0;
+        }
+        else if (inimigo->x > jogador->x)
+        {
+            direcao = -1;
+            inimigo->viradoParaEsquerda = 1;
+        }
     }
 
-    // Pulo e queda
-    if (inimigo->pulando || !inimigo->nochao)
+    inimigo->x += inimigo->velocidade_movimento * deltaTime * direcao;
+}
+bool verificarColisaoChaoInimigo(Inimigo *inimigo)
+{
+    if (inimigo->y >= TELA_ALTURA - inimigo->h - 50)
+    {
+        inimigo->y = TELA_ALTURA - inimigo->h - 50;
+        inimigo->nochao = true;
+        inimigo->velocidadeY = 0;
+        return true;
+    }
+    return false;
+}
+void movimentoVerticalInimigo(Inimigo *inimigo)
+{
+    if (!inimigo->nochao)
     {
         inimigo->y += inimigo->velocidadeY;
         inimigo->velocidadeY += GRAVIDADE;
-
-        if (inimigo->y >= TELA_ALTURA - inimigo->h - 50)
+        if (inimigo->vida > 0)
         {
-            inimigo->y = TELA_ALTURA - inimigo->h - 50;
-            inimigo->pulando = false;
-            inimigo->nochao = true;
-            inimigo->velocidadeY = 0;
+            verificarColisaoChaoInimigo(inimigo);
         }
     }
+}
+void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
+{
+    movimentoHorizontalInimigo(inimigo, jogador);
+    movimentoVerticalInimigo(inimigo);
 }
 
 void desenhaInimigo(Inimigo *inimigo)
@@ -136,29 +155,43 @@ void desenhaInimigo(Inimigo *inimigo)
     !inimigo->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectInimigo, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectInimigo);
 }
 
-void tornaJogadorMortal(Jogador *jogador)
+// Função chamada quando o temporizador expira para desativar a imunidade
+Uint32 tornaJogadorMortal(Uint32 interval, void *param)
 {
-    if (jogador->imune == true)
-    {
-        jogador->imune = false;
-    }
+    Jogador *jogador = (Jogador *)param;
+    jogador->imune = false; // Desativa imunidade
+    return 0;               // Para que o temporizador seja chamado apenas uma vez
 }
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
 {
-    if (jogador->x + jogador->w >= inimigo->x && jogador->x <= inimigo->x + inimigo->w &&
+    // Verifica colisão geral entre jogador e inimigo com tolerância para laterais
+    if (jogador->x + jogador->w >= inimigo->x - 10 && jogador->x <= inimigo->x + inimigo->w + 10 &&
         jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
     {
-        if (jogador->resgatando == false)
+        // Verifica se o jogador está acima do inimigo e em movimento descendente
+        if (jogador->y + jogador->h <= inimigo->y + inimigo->h / 2 && jogador->velocidadeY > 0)
         {
-            jogador->vida--;
-        }
-        else if (jogador->resgatando == true)
-        {
-            jogador->resgatando = false;
+            // Jogador pula no inimigo
+            inimigo->vida--;
+            inimigo->nochao = false;
+            jogador->pontos += 100;
 
-            // jogador->imune = true;
-            // SDL_TimerID timerId = SDL_AddTimer(2000, tornaJogadorMortal, jogador);
+            jogador->velocidadeY = -15;
+        }
+        else
+        {
+            // Jogador colidiu com o inimigo, mas não por cima
+            if (!jogador->resgatando)
+            {
+                // jogador->vida--;
+            }
+            else
+            {
+                jogador->resgatando = false;
+                jogador->imune = true;
+                SDL_AddTimer(2000, tornaJogadorMortal, jogador); // Configura imunidade por 2 segundos
+            }
         }
     }
 }

@@ -148,7 +148,7 @@ void telaRecordes() // OK
         SDL_RenderPresent(renderizador);
     }
 }
-void telaPause() // OK
+void telaPause() // TODO: Manter estados dos inimigos
 {
     int pause = 1;
     escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
@@ -206,7 +206,7 @@ void telaFinal(Jogador *jogador) // TODO
                     case SDLK_ESCAPE:
                         destroi(janela);
                         exit(0);
-                    case SDLK_SPACE:
+                    case SDLK_RSHIFT:
                         jogador->fichas += 3;
                         exibeFichas(jogador->fichas);
                         SDL_Delay(500);

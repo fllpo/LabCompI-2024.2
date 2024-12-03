@@ -189,9 +189,8 @@ bool verificarColisaoChao(Jogador *jogador)
     return false;
 }
 
-void movimentoVertical(Jogador *jogador)
+void movimentoVerticalJogador(Jogador *jogador)
 {
-
     jogadorSalta(jogador);
 
     if (!verificarColisaoPlataformas(jogador))
@@ -200,7 +199,7 @@ void movimentoVertical(Jogador *jogador)
     verificarColisaoChao(jogador);
 }
 
-void movimentoHorizontal(Jogador *jogador)
+void movimentoHorizontalJogador(Jogador *jogador)
 {
     if (jogador->movDireita)
     {
@@ -235,13 +234,14 @@ void movimentoHorizontal(Jogador *jogador)
 }
 void atualizaJogador(Jogador *jogador)
 {
-    movimentoHorizontal(jogador);
-    movimentoVertical(jogador);
+    movimentoHorizontalJogador(jogador);
+    movimentoVerticalJogador(jogador);
 }
 
 void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)
 {
     SDL_Rect rectJogador = {jogador->x + jogador->scrollX, jogador->y, jogador->w, jogador->h};
+
     SDL_Texture *texturaAtual;
 
     if (!jogador->nochao)
@@ -250,15 +250,16 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
     else if (jogador->movDireita || jogador->movEsquerda)
     {
-        texturaAtual = run[SDL_GetTicks() / 150 % 6];
+        texturaAtual = run[SDL_GetTicks() / 150 % jogador->num_run];
     }
     else
     {
         if (jogador->velocidadeY == 0)
         {
-            texturaAtual = idle[SDL_GetTicks() / 300 % 4];
+            texturaAtual = idle[SDL_GetTicks() / 300 % jogador->num_idle];
         }
     }
 
+    jogador->imune ? SDL_SetTextureAlphaMod(texturaAtual, 128) : SDL_SetTextureAlphaMod(texturaAtual, 255);
     jogador->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectJogador);
 }

@@ -88,9 +88,8 @@ void liberaNPCs()
     }
 }
 
-void atualizaNPC(Npc *npc, Jogador *jogador)
+void movimentoHorizontalNPC(Npc *npc, Jogador *jogador)
 {
-    npc->posicao_fila = 0;
     if (npc->resgatado)
     {
         for (int i = 0; i < num_npcs; i++)
@@ -104,10 +103,6 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
                 npc->posicao_fila++;
             }
         }
-    }
-
-    if (npc->resgatado)
-    {
 
         float posicao_x = npc->x;
 
@@ -130,37 +125,57 @@ void atualizaNPC(Npc *npc, Jogador *jogador)
             npc->x -= jogador->velocidade_movimento * deltaTime;
             npc->viradoParaEsquerda = 1;
         }
-
-        // Pulo e queda
-        if (!jogador->nochao)
-        {
-            npc->y += jogador->velocidadeY;
-            npc->velocidadeY += GRAVIDADE;
-
-            if (npc->y >= TELA_ALTURA - npc->h - 50)
-            {
-                npc->y = TELA_ALTURA - npc->h - 50;
-                npc->nochao = true;
-                npc->velocidadeY = 0;
-            }
-        }
     }
-    if (npc->resgatado == false)
+    else
     {
         npc->x = npc->x;
     }
+}
 
-    if (!npc->nochao)
+bool verificarColisaoChaoNPC(Npc *npc)
+{
+    if (npc->y >= TELA_ALTURA - npc->h - 50)
     {
-        npc->y += jogador->velocidadeY;
-        npc->velocidadeY += GRAVIDADE;
-        if (npc->y >= TELA_ALTURA - npc->h - 10)
+        npc->y = TELA_ALTURA - npc->h - 50;
+        npc->nochao = true;
+        npc->velocidadeY = 0;
+        return true;
+    }
+    return false;
+}
+
+void movimentoVerticalNPC(Npc *npc, Jogador *jogador)
+{
+    if (npc->resgatado)
+    {
+        npc->y = jogador->y + npc->h;
+    }
+}
+
+void atualizaFilaNPC(Npc *npc)
+{
+    npc->posicao_fila = 0;
+    if (npc->resgatado)
+    {
+        for (int i = 0; i < num_npcs; i++)
         {
-            npc->y = TELA_ALTURA - npc->h - 10;
-            npc->nochao = true;
-            npc->velocidadeY = 0;
+            if (&npc[i] == npc)
+            {
+                break;
+            }
+            if (npc[i].resgatado)
+            {
+                npc->posicao_fila++;
+            }
         }
     }
+}
+
+void atualizaNPC(Npc *npc, Jogador *jogador)
+{
+    atualizaFilaNPC(npc);
+    movimentoHorizontalNPC(npc, jogador);
+    movimentoVerticalNPC(npc, jogador);
 }
 
 void desenhaNPC(Npc *npc)

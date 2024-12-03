@@ -57,7 +57,7 @@ void limparRecursos()
 
 int main(int argc, char *args[])
 {
-    printf("Para fins de teste:\n\nEspaco: +pontos\nF: +3 fichas (ao acabar o jogo)\n");
+    printf("Para fins de teste:\nMorte do jogador desativada em colisaoJogadorInimigo(Jogador*, Inimigo*);\nRight Shift: +3 fichas (ao acabar o jogo)\n");
 
     if (!iniciaJanela())
     {
