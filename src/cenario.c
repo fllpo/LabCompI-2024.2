@@ -8,7 +8,6 @@ Plataforma plataformas[] = {
     {450, TELA_ALTURA - 200, 150, 50},
     {750, TELA_ALTURA - 400, 250, 50}};
 
-Porta porta = {2000, TELA_ALTURA - 250, 100, 200};
 int qtd_plataformas = sizeof(plataformas) / sizeof(Plataforma);
 
 void inicializaTileset()
@@ -32,12 +31,6 @@ void criaChao(int tamanho)
     }
 }
 
-void criaPorta(Porta *porta)
-{
-    SDL_Rect rectPorta = {porta->x + jogador.scrollX, porta->y, porta->h, porta->w};
-    SDL_SetRenderDrawColor(renderizador, 139, 69, 19, 255);
-    SDL_RenderFillRect(renderizador, &rectPorta);
-}
 void criaPlataformas()
 {
     for (int i = 0; i < qtd_plataformas; i++)
@@ -63,17 +56,12 @@ void criaPlataformas()
     }
 }
 
-void teste()
-{
-    return;
-}
 void desenhaCenario()
 {
     inicializaTileset();
     SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
     SDL_RenderCopy(renderizador, fundo, NULL, NULL);
 
-    criaPorta(&porta);
     criaChao(178);
     criaPlataformas();
 

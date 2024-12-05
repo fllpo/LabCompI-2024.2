@@ -3,10 +3,11 @@
 #include "../include/npc.h"
 
 Npc *npc = NULL;
-int num_npcs = 0;
+int num_npcs;
 
 bool criaNPCs(int quantidade)
 {
+
     if (npc != NULL)
     {
         free(npc);
@@ -20,17 +21,17 @@ bool criaNPCs(int quantidade)
     num_npcs = quantidade;
 
     for (int i = 0; i < num_npcs; i++)
-        iniciaNPC(&npc[i], i);
+        iniciaNPC(&npc[i]);
 
     return true;
 }
 
-bool iniciaNPC(Npc *npc, int index)
+bool iniciaNPC(Npc *npc)
 {
     npc->viradoParaEsquerda = 0;
     npc->h = 50;
     npc->w = 50;
-    npc->x = TELA_LARGURA - (200 * (index + 1));
+    npc->x = rand() % (4500 - 2000) + 2000;
     npc->y = TELA_ALTURA - npc->h - 50;
     npc->velocidadeY = 0;
     npc->velocidade_movimento = 200;
@@ -92,18 +93,6 @@ void movimentoHorizontalNPC(Npc *npc, Jogador *jogador)
 {
     if (npc->resgatado)
     {
-        for (int i = 0; i < num_npcs; i++)
-        {
-            if (&npc[i] == npc)
-            {
-                break;
-            }
-            if (npc[i].resgatado)
-            {
-                npc->posicao_fila++;
-            }
-        }
-
         float posicao_x = npc->x;
 
         if (jogador->viradoParaEsquerda)
@@ -152,7 +141,7 @@ void movimentoVerticalNPC(Npc *npc, Jogador *jogador)
     }
 }
 
-void atualizaFilaNPC(Npc *npc)
+void atualizaFilaNPC(Npc *npc, Jogador *jogador)
 {
     npc->posicao_fila = 0;
     if (npc->resgatado)
@@ -173,7 +162,7 @@ void atualizaFilaNPC(Npc *npc)
 
 void atualizaNPC(Npc *npc, Jogador *jogador)
 {
-    atualizaFilaNPC(npc);
+    atualizaFilaNPC(npc, jogador);
     movimentoHorizontalNPC(npc, jogador);
     movimentoVerticalNPC(npc, jogador);
 }
@@ -211,6 +200,7 @@ void colisaoJogadorNPC(Jogador *jogador, Npc *npc)
         {
             jogador->pontos = jogador->pontos + 100;
             npc->resgatado = true;
+            jogador->resgatando++;
         }
     }
 }

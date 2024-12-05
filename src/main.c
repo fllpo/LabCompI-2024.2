@@ -10,7 +10,7 @@ bool iniciaPersonagens(int selecao)
 {
     iniciaJogador(&jogador, selecao);
 
-    if (!criaNPCs(3))
+    if (!criaNPCs(2))
         return false;
 
     if (!criaInimigos(2))
@@ -38,12 +38,17 @@ void executarLoopJogo()
 {
     while (jogador.vida > 0)
     {
-        Uint32 frameStart = SDL_GetTicks();
-        atualizarDeltaTime(frameStart);
+        if (!verificaFimDeJogo(&jogador))
+        {
+            Uint32 frameStart = SDL_GetTicks();
+            atualizarDeltaTime(frameStart);
 
-        telaJogo();
+            telaJogo();
 
-        gerenciarFrame(frameStart);
+            gerenciarFrame(frameStart);
+        }
+        else
+            break;
     }
 }
 
@@ -57,7 +62,7 @@ void limparRecursos()
 
 int main(int argc, char *args[])
 {
-    printf("Para fins de teste:\nMorte do jogador desativada em colisaoJogadorInimigo(Jogador*, Inimigo*);\nRight Shift: +3 fichas (ao acabar o jogo)\n");
+    printf("Para fins de teste:\nRight Shift: +3 fichas (ao acabar o jogo)\n");
 
     if (!iniciaJanela())
     {
@@ -66,10 +71,13 @@ int main(int argc, char *args[])
     }
 
     telaApresentacao();
+
+Inicio:
+
     telaInicial(&jogador);
     int selecao = telaSelecaoPersonagem(&jogador);
 
-    while (jogador.fichas > 0)
+    while (1)
     {
         if (!iniciaPersonagens(selecao))
         {
@@ -84,7 +92,7 @@ int main(int argc, char *args[])
 
         if (jogador.fichas <= 0)
         {
-            telaInicial(&jogador);
+            goto Inicio;
         }
     }
 

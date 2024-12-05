@@ -7,6 +7,11 @@ typedef struct
     SDL_Rect tiles[25][23];
 } Tileset;
 
+typedef struct
+{
+    int x, y, w, h;
+} Plataforma;
+
 static Tileset tileset;
 void desenhaCenario();
 #endif

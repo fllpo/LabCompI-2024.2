@@ -70,6 +70,44 @@ void destroi(SDL_Window *janela)
     SDL_Quit();
     exit(0);
 }
+void exibePosicao(int x, int y)
+{
+    char texto[30];
+    sprintf(texto, "X:%d Y:%d", x, y);
+    escreveTexto(texto, TELA_LARGURA - 200, TELA_ALTURA - 50, BRANCO);
+}
+void exibeQtdResgatando(int qtd_resgatando)
+{
+    char texto[30];
+    sprintf(texto, "qtd_resgatando:%d", qtd_resgatando);
+    escreveTexto(texto, 40, TELA_ALTURA - 50, BRANCO);
+}
+void fadeOut()
+{
+    for (int i = 0; i <= 255; i++)
+    {
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, i);
+        SDL_SetRenderDrawBlendMode(renderizador, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(renderizador, NULL);
+        SDL_RenderPresent(renderizador);
+    }
+}
+
+bool verificaFimDeJogo(Jogador *jogador)
+{
+    if (jogador->x > 5200 && jogador->resgatando == num_npcs)
+    {
+        jogador->movDireita = true;
+        if (jogador->x >= 6000)
+        {
+            jogador->movDireita = jogador->movEsquerda = false;
+            jogador->x = 6000;
+            fadeOut();
+            return true; // termina o jogo
+        }
+    }
+    return false;
+}
 
 void renderiza()
 {
@@ -89,6 +127,8 @@ void renderiza()
 
     exibeVida(jogador.vida);
     exibePontos(jogador.pontos);
+    exibePosicao(jogador.x, jogador.y);     // fins de teste
+    exibeQtdResgatando(jogador.resgatando); // fins de teste
 
     SDL_RenderPresent(renderizador);
     limitaFPS();

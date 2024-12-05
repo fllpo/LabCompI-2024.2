@@ -180,12 +180,15 @@ void telaFinal(Jogador *jogador) // TODO
     jogador->fichas--;
     char nome[4] = {0};
     int i = 0, final = 1;
+
+    fadeOut();
     while (final)
     {
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-        if (jogador->fichas == 0)
+        if (jogador->fichas == 0 || verificaFimDeJogo(jogador))
         {
+            jogador->fichas = 0;
             escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
             escreveTexto("Pressione espaco para adicionar mais fichas!", 200, 250, BRANCO);
             escreveTexto("Escreva seu nome (max 3 letras):", 100, 400, BRANCO);
@@ -253,6 +256,7 @@ void telaFinal(Jogador *jogador) // TODO
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
+            jogador->resgatando = 0;
             exibeFichas(jogador->fichas);
             while (SDL_PollEvent(&e))
             {
@@ -403,12 +407,10 @@ void telaInicial(Jogador *jogador) // OK
                     destroi(janela);
                     exit(0);
                 case SDLK_UP:
-
                     if (selecao > 0)
                         selecao--;
                     break;
                 case SDLK_DOWN:
-
                     if (selecao < 2)
                         selecao++;
                     break;

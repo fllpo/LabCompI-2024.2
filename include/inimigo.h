@@ -9,7 +9,7 @@ extern int num_inimigos;
 SDL_Texture **inimigo_textura;
 
 bool criaInimigos(int quantidade);
-bool iniciaInimigo(Inimigo *inimigo, int index);
+bool iniciaInimigo(Inimigo *inimigo);
 void atualizaTodosInimigos(Jogador *jogador);
 void desenhaTodosInimigos(void);
 void verificaTodasColisoesInimigo(Jogador *jogador);

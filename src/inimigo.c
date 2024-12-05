@@ -1,9 +1,12 @@
 #include "../include/utils.h"
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
+#include "../include/npc.h"
 
 Inimigo *inimigos = NULL;
 int num_inimigos = 0;
+extern int num_npcs;
+extern Npc *npc;
 
 bool criaInimigos(int quantidade)
 {
@@ -22,21 +25,20 @@ bool criaInimigos(int quantidade)
 
     for (int i = 0; i < num_inimigos; i++)
     {
-        iniciaInimigo(&inimigos[i], i);
+        iniciaInimigo(&inimigos[i]);
     }
 
     return true;
 }
 
-bool iniciaInimigo(Inimigo *inimigo, int index)
+bool iniciaInimigo(Inimigo *inimigo)
 {
     inimigo->vida = 1;
     inimigo->h = 100;
     inimigo->w = 100;
-    inimigo->x = TELA_LARGURA - (200 * (index + 1));
+    inimigo->x = rand() % (4500 - 2000) + 2000;
     inimigo->y = TELA_ALTURA - inimigo->h - 50;
     inimigo->viradoParaEsquerda = 0;
-    inimigo->pulando = true;
     inimigo->velocidadeY = 0;
     inimigo->velocidade_movimento = 200;
     inimigo->nochao = true;
@@ -155,7 +157,6 @@ void desenhaInimigo(Inimigo *inimigo)
     !inimigo->viradoParaEsquerda ? SDL_RenderCopyEx(renderizador, texturaAtual, NULL, &rectInimigo, 0, NULL, SDL_FLIP_HORIZONTAL) : SDL_RenderCopy(renderizador, texturaAtual, NULL, &rectInimigo);
 }
 
-// Função chamada quando o temporizador expira para desativar a imunidade
 Uint32 tornaJogadorMortal(Uint32 interval, void *param)
 {
     Jogador *jogador = (Jogador *)param;
@@ -165,32 +166,52 @@ Uint32 tornaJogadorMortal(Uint32 interval, void *param)
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
 {
-    // Verifica colisão geral entre jogador e inimigo com tolerância para laterais
     if (jogador->x + jogador->w >= inimigo->x - 10 && jogador->x <= inimigo->x + inimigo->w + 10 &&
         jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
     {
-        // Verifica se o jogador está acima do inimigo e em movimento descendente
-        if (jogador->y + jogador->h <= inimigo->y + inimigo->h / 2 && jogador->velocidadeY > 0)
+
+        // Jogador pula no inimigo
+        if (jogador->y + jogador->h <= inimigo->y + inimigo->h / 2)
         {
-            // Jogador pula no inimigo
             inimigo->vida--;
             inimigo->nochao = false;
             jogador->pontos += 100;
 
             jogador->velocidadeY = -15;
         }
-        else
+        else if (!jogador->imune)
         {
             // Jogador colidiu com o inimigo, mas não por cima
-            if (!jogador->resgatando)
+            if (jogador->resgatando == 0)
             {
-                // jogador->vida--;
+                jogador->vida--;
             }
-            else
+            else if (jogador->resgatando > 0)
             {
-                jogador->resgatando = false;
+                jogador->resgatando = 0;
+
+                for (int i = 0; i < num_inimigos; i++)
+                {
+                    npc[i].resgatado = false;
+                    if (npc[i].viradoParaEsquerda)
+                    {
+                        npc[i].x += 500;
+                        if (npc[i].x >= 5000)
+                        {
+                            npc[i].x = 5000;
+                        }
+                    }
+                    else
+                    {
+                        npc[i].x -= 500;
+                        if (npc[i].x <= 0)
+                        {
+                            npc[i].x = 10;
+                        }
+                    }
+                }
                 jogador->imune = true;
-                SDL_AddTimer(2000, tornaJogadorMortal, jogador); // Configura imunidade por 2 segundos
+                SDL_AddTimer(3000, tornaJogadorMortal, jogador);
             }
         }
     }

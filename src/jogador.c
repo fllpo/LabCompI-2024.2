@@ -8,7 +8,6 @@
 Jogador jogador = {TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, 100, 100};
 extern int qtd_plataformas;
 extern Plataforma plataformas[];
-extern Porta porta;
 void liberaJogador(Jogador *jogador)
 {
     if (idle)
@@ -42,6 +41,7 @@ void liberaJogador(Jogador *jogador)
         jump = NULL;
     }
 }
+
 bool iniciaJogador(Jogador *jogador, int selecao)
 {
     jogador->vida = 1;
@@ -54,7 +54,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
     jogador->scrollX = 0;
     jogador->y = TELA_ALTURA / 2 - jogador->h;
     jogador->velocidadeY = 0;
-    jogador->resgatando = false;
+    jogador->resgatando = 0;
     jogador->imune = false;
     const char *personagem;
 
@@ -101,6 +101,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
     {
         snprintf(caminho, sizeof(caminho), "assets/img/Characters/Players/%s/Sprites/idle/player-idle-%d.png", personagem, i + 1);
         idle[i] = IMG_LoadTexture(renderizador, caminho);
+
         if (idle[i] == NULL)
         {
             liberaJogador(jogador);
@@ -179,6 +180,7 @@ void jogadorSalta(Jogador *jogador)
 
 bool verificarColisaoChao(Jogador *jogador)
 {
+
     if (jogador->y >= TELA_ALTURA - jogador->h - 50)
     {
         jogador->velocidadeY = 0;
@@ -222,20 +224,11 @@ void movimentoHorizontalJogador(Jogador *jogador)
     {
         jogador->scrollX = -16 * 300;
     }
-
-    // colisão com porta
-    if (jogador->x + jogador->w > porta.x &&
-        jogador->x < porta.x + porta.w &&
-        jogador->y + jogador->h > porta.y &&
-        jogador->y < porta.y + porta.h && jogador->pontos >= num_npcs * 100)
-    {
-        // Conta os pontos, ganha o jogo
-    }
 }
 void atualizaJogador(Jogador *jogador)
 {
-    movimentoHorizontalJogador(jogador);
     movimentoVerticalJogador(jogador);
+    movimentoHorizontalJogador(jogador);
 }
 
 void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL_Texture **jump)

@@ -7,7 +7,7 @@ extern Npc *npc;
 extern int num_npcs;
 SDL_Texture **npc_textura;
 bool criaNPCs(int quantidade);
-bool iniciaNPC(Npc *npc, int index);
+bool iniciaNPC(Npc *npc);
 void desenhaNPC(Npc *npc);
 void atualizaNPC(Npc *npc, Jogador *jogador);
 void atualizaTodosNPCs(Jogador *jogador);
