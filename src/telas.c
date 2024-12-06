@@ -189,10 +189,11 @@ void telaFinal(Jogador *jogador) // TODO
         if (jogador->fichas == 0 || verificaFimDeJogo(jogador))
         {
             jogador->fichas = 0;
-            escreveTexto("Obrigado por jogar!", 200, 200, BRANCO);
-            escreveTexto("Pressione espaco para adicionar mais fichas!", 200, 250, BRANCO);
-            escreveTexto("Escreva seu nome (max 3 letras):", 100, 400, BRANCO);
-            escreveTexto(nome, 100, 450, BRANCO);
+            escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
+            escreveTexto("Pressione RSHIFT para", 200, 250, BRANCO);
+            escreveTexto("adicionar mais fichas!", 200, 300, BRANCO);
+            escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
+            escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
             exibeFichas(jogador->fichas);
 
             while (SDL_PollEvent(&e))
@@ -212,6 +213,7 @@ void telaFinal(Jogador *jogador) // TODO
                     case SDLK_RSHIFT:
                         jogador->fichas += 3;
                         exibeFichas(jogador->fichas);
+                        final = 0;
                         SDL_Delay(500);
                         break;
                     case SDLK_BACKSPACE:
@@ -237,7 +239,7 @@ void telaFinal(Jogador *jogador) // TODO
                     }
                 }
             }
-            if (i == 3)
+            if (i == 3 && final == 0)
             {
                 if (jogador->recorde < jogador->pontos)
                 {
@@ -247,7 +249,7 @@ void telaFinal(Jogador *jogador) // TODO
                 else
                     gravarRecordes(nome, jogador->recorde);
 
-                escreveTexto(nome, 100, 450, BRANCO);
+                escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
                 SDL_RenderPresent(renderizador);
                 SDL_Delay(1000);
                 final = 0;
@@ -256,8 +258,10 @@ void telaFinal(Jogador *jogador) // TODO
         else
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
+
             jogador->resgatando = 0;
             exibeFichas(jogador->fichas);
+
             while (SDL_PollEvent(&e))
             {
                 if (e.type == SDL_QUIT)

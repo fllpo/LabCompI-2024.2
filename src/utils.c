@@ -102,7 +102,6 @@ bool verificaFimDeJogo(Jogador *jogador)
         {
             jogador->movDireita = jogador->movEsquerda = false;
             jogador->x = 6000;
-            fadeOut();
             return true; // termina o jogo
         }
     }

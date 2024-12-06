@@ -138,30 +138,35 @@ bool iniciaJogador(Jogador *jogador, int selecao)
 
     return true;
 }
+
 void aplicarGravidade(Jogador *jogador)
 {
     jogador->y += jogador->velocidadeY;
     jogador->velocidadeY += GRAVIDADE;
-    jogador->nochao = false;
 }
 
 bool verificarColisaoPlataformas(Jogador *jogador)
 {
     for (int i = 0; i < qtd_plataformas; i++)
     {
-        if (jogador->x + jogador->w > plataformas[i].x &&
-            jogador->x < plataformas[i].x + plataformas[i].w &&
-            jogador->y + jogador->h >= plataformas[i].y &&
-            jogador->y + jogador->h <= plataformas[i].y + 10)
-        {
-            jogador->velocidadeY = 0;
-            jogador->y = plataformas[i].y - jogador->h;
-            jogador->nochao = true;
+        // Adiciona uma margem de segurança
+        const float margem = 5.0f;
 
+        bool dentroDosLimitesHorizontais =
+            jogador->x + jogador->w - margem > plataformas[i].x &&
+            jogador->x + margem < plataformas[i].x + plataformas[i].w;
+
+        bool atingiuPorCima =
+            jogador->y + jogador->h >= plataformas[i].y &&
+            jogador->y + jogador->h <= plataformas[i].y + jogador->velocidadeY;
+
+        if (dentroDosLimitesHorizontais && atingiuPorCima)
+        {
+            jogador->y = plataformas[i].y - jogador->h;
+            jogador->velocidadeY = 0;
             return true;
         }
     }
-    jogador->nochao = false;
     return false;
 }
 
@@ -180,12 +185,10 @@ void jogadorSalta(Jogador *jogador)
 
 bool verificarColisaoChao(Jogador *jogador)
 {
-
     if (jogador->y >= TELA_ALTURA - jogador->h - 50)
     {
         jogador->velocidadeY = 0;
         jogador->y = TELA_ALTURA - jogador->h - 50;
-        jogador->nochao = true;
         return true;
     }
     return false;
@@ -193,12 +196,17 @@ bool verificarColisaoChao(Jogador *jogador)
 
 void movimentoVerticalJogador(Jogador *jogador)
 {
-    jogadorSalta(jogador);
 
-    if (!verificarColisaoPlataformas(jogador))
-        aplicarGravidade(jogador);
+    aplicarGravidade(jogador);
 
-    verificarColisaoChao(jogador);
+    jogador->nochao = verificarColisaoPlataformas(jogador) || verificarColisaoChao(jogador);
+
+    if (jogador->salta && jogador->nochao)
+    {
+        jogador->velocidadeY = jogador->forca_salto;
+        jogador->salta = false;
+        jogador->nochao = false;
+    }
 }
 
 void movimentoHorizontalJogador(Jogador *jogador)
