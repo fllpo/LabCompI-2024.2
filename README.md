@@ -7,7 +7,7 @@ Este projeto é um jogo de plataforma desenvolvido para Linux como trabalho acad
 
 Você controla um personagem que precisa salvar criaturas adoráveis enquanto evita inimigos perigosos. Inspirado no clássico [Flicky](https://www.youtube.com/watch?v=imHqXZNUOZs) (Sega Genesis e Mega Drive), o jogo tem mecânicas de plataforma simples com desafios crescentes.
 
-## Demonstração e Screenshots
+## 📺 Demonstração e Screenshots
 ### Menu Inicial
 ![Menu inicial](https://github.com/user-attachments/assets/d06e9acc-46ed-4405-8f24-6c0f0713cfa0)
 ### Tela do Jogo
