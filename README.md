@@ -44,7 +44,7 @@ Execute
   make
 ```
 
-## Autores
+## ✍️ Autores
 
 - [@André Silvestre](https://github.com/andresilvestrejr)
 - [@Fellipe Oliveira](https://www.github.com/fllpo)
