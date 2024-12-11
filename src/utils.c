@@ -6,6 +6,17 @@
 #include "../include/telas.h"
 #include "../include/cenario.h"
 
+void carregaSons()
+{
+    pulo_sfx = Mix_LoadWAV("assets/sfx/Jump 1.wav");
+    coleta_sfx = Mix_LoadWAV("assets/sfx/Fruit collect 1.wav");
+    hit_sfx = Mix_LoadWAV("assets/sfx/Hit damage 1.wav");
+    seleciona_sfx = Mix_LoadWAV("assets/sfx/Select 1.wav");
+    if (!pulo_sfx || !coleta_sfx || !hit_sfx || !seleciona_sfx)
+    {
+        printf("Erro ao carregar som: %s\n", Mix_GetError());
+    }
+}
 int iniciaJanela(void)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -15,9 +26,16 @@ int iniciaJanela(void)
     }
     if (TTF_Init() < 0)
     {
-        printf("Erro ao iniciar TTF: %s\n", TTF_GetError());
+        printf("Erro ao iniciar SDL_TTF: %s\n", TTF_GetError());
         return 0;
     }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("Erro ao iniciar SDL_mixer: %s\n", Mix_GetError());
+        return 0;
+    }
+    carregaSons();
+
     fonte = TTF_OpenFont("assets/font/Roboto.ttf", 25);
     if (fonte == NULL)
     {
@@ -64,7 +82,11 @@ void destroi(SDL_Window *janela)
         if (i < 2 && jump[i])
             SDL_DestroyTexture(jump[i]);
     }
-
+    Mix_FreeChunk(pulo_sfx);
+    Mix_FreeChunk(coleta_sfx);
+    Mix_FreeChunk(hit_sfx);
+    Mix_FreeChunk(seleciona_sfx);
+    Mix_CloseAudio();
     TTF_CloseFont(fonte);
     TTF_Quit();
     SDL_Quit();
@@ -102,7 +124,7 @@ bool verificaFimDeJogo(Jogador *jogador)
         {
             jogador->movDireita = jogador->movEsquerda = false;
             jogador->x = 6000;
-            return true; // termina o jogo
+            return true;
         }
     }
     return false;
@@ -165,6 +187,7 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
                 jogador->movEsquerda = true;
                 break;
             case SDLK_SPACE:
+                Mix_PlayChannel(-1, pulo_sfx, 0);
                 jogador->salta = true;
                 break;
             }
@@ -181,6 +204,7 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
                 break;
             case SDLK_SPACE:
                 jogador->salta = false;
+
                 break;
             }
         }
@@ -206,7 +230,7 @@ void exibeVida(int vida)
 }
 void escreveTexto(char *texto, int x, int y, SDL_Color cor)
 {
-    // Renderiza o texto preto para a borda
+
     SDL_Surface *textoPreto = TTF_RenderText_Solid(fonte, texto, PRETO);
     SDL_Texture *texturaPreto = SDL_CreateTextureFromSurface(renderizador, textoPreto);
     SDL_Rect posicaoPreto = {x - 1, y - 1, 0, 0};
@@ -232,7 +256,6 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_Rect posicaoBranco = {x, y, posicaoPreto.w, posicaoPreto.h};
     SDL_RenderCopy(renderizador, texturaBranco, NULL, &posicaoBranco);
 
-    // Libera os recursos
     SDL_FreeSurface(textoPreto);
     SDL_FreeSurface(textoBranco);
     SDL_DestroyTexture(texturaPreto);

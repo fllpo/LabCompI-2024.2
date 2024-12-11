@@ -68,11 +68,18 @@ int telaSelecaoPersonagem(Jogador *jogador)
                     exit(0);
                 case SDLK_UP:
                     if (selecao > 0)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         selecao--;
+                    }
                     break;
                 case SDLK_DOWN:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
                     if (selecao < 1)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         selecao++;
+                    }
                     break;
                 case SDLK_RETURN:
                     menu = 0;
@@ -219,6 +226,7 @@ void telaFinal(Jogador *jogador) // TODO
                     case SDLK_BACKSPACE:
                         if (i > 0)
                         {
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
                             i--;
                             nome[i] = '\0';
                         }
@@ -232,6 +240,7 @@ void telaFinal(Jogador *jogador) // TODO
                     default:
                         if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
                         {
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
                             nome[i] = toupper(e.key.keysym.sym);
                             i++;
                         }
@@ -255,7 +264,7 @@ void telaFinal(Jogador *jogador) // TODO
                 final = 0;
             }
         }
-        else
+        else // TODO
         {
             escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
 
@@ -412,11 +421,17 @@ void telaInicial(Jogador *jogador) // OK
                     exit(0);
                 case SDLK_UP:
                     if (selecao > 0)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         selecao--;
+                    }
                     break;
                 case SDLK_DOWN:
                     if (selecao < 2)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         selecao++;
+                    }
                     break;
                 case SDLK_RETURN:
                     switch (selecao)

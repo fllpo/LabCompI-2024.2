@@ -1,7 +1,7 @@
 OBJS = main.c
 CC = gcc
 OBJ_NAME = main
-LD_FLAGS = -lSDL2 -lSDL2_ttf -lSDL2_image
+LD_FLAGS = -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
 all : src/$(OBJS)
 	clear

@@ -176,6 +176,7 @@ void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
             inimigo->vida--;
             inimigo->nochao = false;
             jogador->pontos += 100;
+            Mix_PlayChannel(-1, hit_sfx, 0);
 
             jogador->velocidadeY = -15;
         }

@@ -198,6 +198,7 @@ void colisaoJogadorNPC(Jogador *jogador, Npc *npc)
     {
         if (npc->resgatado == false)
         {
+            Mix_PlayChannel(-1, coleta_sfx, 0);
             jogador->pontos = jogador->pontos + 100;
             npc->resgatado = true;
             jogador->resgatando++;
