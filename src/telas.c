@@ -153,9 +153,11 @@ void telaRecordes()
 
 void telaFinal(Jogador *jogador)
 {
+    /*
     jogador->fichas--;
     char nome[4] = {0};
     int i = 0, final = 1;
+    bool continuar = false;
 
     fadeOut();
     while (final)
@@ -164,74 +166,113 @@ void telaFinal(Jogador *jogador)
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         if (jogador->fichas == 0 || verificaFimDeJogo(jogador))
         {
-            jogador->fichas = 0;
-            escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
-            escreveTexto("Pressione RSHIFT para", 200, 250, BRANCO);
-            escreveTexto("adicionar mais fichas!", 200, 300, BRANCO);
-            escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
-            escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
-            exibeFichas(jogador->fichas);
-
-            while (SDL_PollEvent(&e))
+            for (int contador_final = 10; contador_final >= 0; contador_final--)
             {
-                if (e.type == SDL_QUIT)
+                if (continuar)
+                    break;
+                else
                 {
-                    destroi(janela);
-                    exit(0);
-                }
-                else if (e.type == SDL_KEYDOWN)
-                {
-                    switch (e.key.keysym.sym)
+                    char texto[10];
+                    sprintf(texto, "%d", contador_final);
+                    escreveTexto(texto, TELA_LARGURA / 2 - 10, TELA_ALTURA / 2 - 20, BRANCO);
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
+                    escreveTexto("RSHIFT para adicionar mais fichas", TELA_LARGURA / 2 - 200, TELA_ALTURA - 50, BRANCO);
+                    SDL_RenderPresent(renderizador);
+                    SDL_Delay(1000);
+                    SDL_RenderClear(renderizador);
+                    while (SDL_PollEvent(&e))
                     {
-                    case SDLK_ESCAPE:
-                        destroi(janela);
-                        exit(0);
-                    case SDLK_RSHIFT:
-                        jogador->fichas += 3;
-                        exibeFichas(jogador->fichas);
-                        final = 0;
-                        SDL_Delay(500);
-                        break;
-                    case SDLK_BACKSPACE:
-                        if (i > 0)
+                        if (e.type == SDL_QUIT)
                         {
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            i--;
-                            nome[i] = '\0';
+                            destroi(janela);
+                            exit(0);
                         }
-                        break;
-                    case SDLK_RETURN:
-                        Mix_PlayChannel(-1, seleciona_sfx, 0);
-                        if (i > 0)
+                        else if (e.type == SDL_KEYDOWN)
                         {
-                            final = 0;
+                            switch (e.key.keysym.sym)
+                            {
+                            case SDLK_ESCAPE:
+                                destroi(janela);
+                                exit(0);
+                            case SDLK_RSHIFT:
+                                jogador->fichas += 3;
+                                continuar = true;
+                                final = 0;
+                                SDL_Delay(500);
+                                break;
+                            }
                         }
-                        break;
-                    default:
-                        if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
-                        {
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            nome[i] = toupper(e.key.keysym.sym);
-                            i++;
-                        }
-                        break;
                     }
                 }
             }
-            if (i == 3 && final == 0)
-            {
-                if (jogador->recorde < jogador->pontos)
-                {
-                    jogador->recorde = jogador->pontos;
-                    gravarRecordes(nome, jogador->recorde);
-                }
-                else
-                    gravarRecordes(nome, jogador->recorde);
 
+            if (jogador->fichas == 0 && !continuar)
+            {
+                escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
+                escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
                 escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
-                SDL_RenderPresent(renderizador);
-                SDL_Delay(1000);
-                final = 0;
+                fflush(stdin);
+                while (SDL_PollEvent(&e))
+                {
+                    if (e.type == SDL_QUIT)
+                    {
+                        destroi(janela);
+                        exit(0);
+                    }
+                    else if (e.type == SDL_KEYDOWN)
+                    {
+                        switch (e.key.keysym.sym)
+                        {
+                        case SDLK_ESCAPE:
+                            destroi(janela);
+                            exit(0);
+                        case SDLK_RSHIFT:
+                            jogador->fichas += 3;
+                            exibeFichas(jogador->fichas);
+                            final = 0;
+                            SDL_Delay(500);
+                            break;
+                        case SDLK_BACKSPACE:
+                            if (i > 0)
+                            {
+                                Mix_PlayChannel(-1, seleciona_sfx, 0);
+                                i--;
+                                nome[i] = '\0';
+                            }
+                            break;
+                        case SDLK_RETURN:
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
+                            if (i > 0)
+                            {
+                                final = 0;
+                            }
+                            break;
+                        default:
+                            if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
+                            {
+                                Mix_PlayChannel(-1, seleciona_sfx, 0);
+                                nome[i] = toupper(e.key.keysym.sym);
+                                i++;
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (i == 3 && final == 0)
+                {
+                    if (jogador->recorde < jogador->pontos)
+                    {
+                        jogador->recorde = jogador->pontos;
+                        gravarRecordes(nome, jogador->recorde);
+                    }
+                    else
+                        gravarRecordes(nome, jogador->recorde);
+
+                    escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
+                    SDL_RenderPresent(renderizador);
+                    SDL_Delay(1000);
+                    final = 0;
+                }
             }
         }
         else
@@ -255,6 +296,151 @@ void telaFinal(Jogador *jogador)
             }
         }
         SDL_RenderPresent(renderizador);
+    }*/
+    jogador->fichas--;
+    char nome[4] = {0};
+    int i = 0, final = 1;
+    bool continuar = false;
+
+    fadeOut();
+
+    if (jogador->fichas == 0 || verificaFimDeJogo(jogador))
+    {
+        // Contagem regressiva
+        for (int contador_final = 10; contador_final >= 0; contador_final--)
+        {
+            SDL_RenderClear(renderizador);
+            if (continuar)
+                break;
+
+            char texto[10];
+            sprintf(texto, "%d", contador_final);
+            escreveTexto(texto, TELA_LARGURA / 2 - 10, TELA_ALTURA / 2 - 20, BRANCO);
+            Mix_PlayChannel(-1, seleciona_sfx, 0);
+            escreveTexto("RSHIFT para adicionar mais fichas", TELA_LARGURA / 2 - 200, TELA_ALTURA - 50, BRANCO);
+            SDL_RenderPresent(renderizador);
+            SDL_Delay(1000);
+            SDL_RenderClear(renderizador);
+
+            // Processa eventos
+            while (SDL_PollEvent(&e))
+            {
+                if (e.type == SDL_QUIT)
+                {
+                    destroi(janela);
+                    exit(0);
+                }
+                else if (e.type == SDL_KEYDOWN)
+                {
+                    if (e.key.keysym.sym == SDLK_ESCAPE)
+                    {
+                        destroi(janela);
+                        exit(0);
+                    }
+                    else if (e.key.keysym.sym == SDLK_RSHIFT)
+                    {
+                        jogador->fichas += 3;
+                        continuar = true;
+                        final = 0;
+                        SDL_Delay(500);
+                    }
+                }
+            }
+        }
+
+        while (final)
+        {
+            SDL_RenderClear(renderizador);
+            SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
+
+            // Se o jogador não tem fichas e não decidiu continuar
+            if (jogador->fichas == 0 && !continuar)
+            {
+                escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
+                escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
+                escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
+                fflush(stdin);
+
+                // Processa entrada do nome
+                while (SDL_PollEvent(&e))
+                {
+                    if (e.type == SDL_QUIT)
+                    {
+                        destroi(janela);
+                        exit(0);
+                    }
+                    else if (e.type == SDL_KEYDOWN)
+                    {
+                        if (e.key.keysym.sym == SDLK_ESCAPE)
+                        {
+                            destroi(janela);
+                            exit(0);
+                        }
+                        else if (e.key.keysym.sym == SDLK_RSHIFT)
+                        {
+                            jogador->fichas += 3;
+                            exibeFichas(jogador->fichas);
+                            final = 0;
+                            SDL_Delay(500);
+                        }
+                        else if (e.key.keysym.sym == SDLK_BACKSPACE && i > 0)
+                        {
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
+                            i--;
+                            nome[i] = '\0';
+                        }
+                        else if (e.key.keysym.sym == SDLK_RETURN && i > 0)
+                        {
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
+                            final = 0;
+                        }
+                        else if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
+                        {
+                            Mix_PlayChannel(-1, seleciona_sfx, 0);
+                            nome[i] = toupper(e.key.keysym.sym);
+                            i++;
+                        }
+                    }
+                }
+
+                // Salva o recorde se o nome tiver 3 caracteres
+                if (i == 3 && final == 0)
+                {
+                    if (jogador->recorde < jogador->pontos)
+                    {
+                        jogador->recorde = jogador->pontos;
+                    }
+                    gravarRecordes(nome, jogador->recorde);
+                    escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
+                    SDL_RenderPresent(renderizador);
+                    SDL_Delay(1000);
+                    final = 0;
+                }
+            }
+
+            else
+            {
+                // Exibe o número de fichas restantes
+                char texto[10];
+                sprintf(texto, "x%d", jogador->fichas);
+                escreveTexto(texto, TELA_ALTURA / 2 + 160, TELA_ALTURA / 2, BRANCO);
+                SDL_Rect imagemRect = {TELA_ALTURA / 2, TELA_ALTURA / 2 - 160 / 2, 160, 160};
+                SDL_RenderCopy(renderizador, idle[0], NULL, &imagemRect);
+
+                // Reinicia o jogo
+                jogador->resgatando = 0;
+                SDL_RenderPresent(renderizador);
+                SDL_Delay(2000);
+                final = 0;
+
+                // Atualiza o recorde se necessário
+                if (jogador->recorde < jogador->pontos)
+                {
+                    jogador->recorde = jogador->pontos;
+                }
+            }
+            SDL_RenderPresent(renderizador);
+        }
     }
 }
 void telaApresentacao()
