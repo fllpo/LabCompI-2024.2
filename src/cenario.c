@@ -5,6 +5,8 @@
 extern Jogador jogador;
 
 Plataforma plataformas[] = {
+    {-50, TELA_ALTURA - 50, 1000, 50},
+    {1200, TELA_ALTURA - 50, 5000, 50},
     {450, TELA_ALTURA - 200, 150, 50},
     {750, TELA_ALTURA - 400, 250, 50}};
 
@@ -20,14 +22,6 @@ void inicializaTileset()
         {
             tileset.tiles[x][y] = (SDL_Rect){x * 16, y * 16, 16, 16};
         }
-    }
-}
-void criaChao(int tamanho)
-{
-    for (int i = 0; i < tamanho; i++)
-    {
-        SDL_Rect rectChao = {50 * i + jogador.scrollX, TELA_ALTURA - 50, 50, 50};
-        SDL_RenderCopy(renderizador, tileset.texture, &tileset.tiles[3][1], &rectChao);
     }
 }
 
@@ -62,7 +56,6 @@ void desenhaCenario()
     SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
     SDL_RenderCopy(renderizador, fundo, NULL, NULL);
 
-    criaChao(178);
     criaPlataformas();
 
     SDL_DestroyTexture(fundo);

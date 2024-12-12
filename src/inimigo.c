@@ -2,9 +2,14 @@
 #include "../include/jogador.h"
 #include "../include/inimigo.h"
 #include "../include/npc.h"
+#include "../include/cenario.h"
+
+extern int qtd_plataformas;
+extern Plataforma plataformas[];
 
 Inimigo *inimigos = NULL;
 int num_inimigos = 0;
+
 extern int num_npcs;
 extern Npc *npc;
 
@@ -100,19 +105,19 @@ void movimentoHorizontalInimigo(Inimigo *inimigo, Jogador *jogador)
     float distancia = jogador->x - inimigo->x;
     float distanciaAbs = fabs(distancia);
     float distanciaY = jogador->y - inimigo->y;
-    
+
     const float DISTANCIA_PERSEGUICAO = 1600.0f;
     const float DISTANCIA_PULO = 200.0f;
-    const float ALTURA_MINIMA_PULO = -100.0f;
-    
+    const float ALTURA_MINIMA_PULO = -50.0f;
+
     // Só pula se o jogador estiver acima E próximo
-    if (inimigo->nochao && 
-        distanciaY < ALTURA_MINIMA_PULO && 
+    if (inimigo->nochao &&
+        distanciaY < ALTURA_MINIMA_PULO &&
         distanciaAbs < DISTANCIA_PULO)
     {
         inimigo->pulando = true;
     }
-    
+
     // Movimento horizontal - sempre persegue o jogador
     if (distanciaAbs < DISTANCIA_PERSEGUICAO)
     {
@@ -154,25 +159,53 @@ bool verificarColisaoChaoInimigo(Inimigo *inimigo)
     }
     return false;
 }
+void aplicarGravidadeInimigo(Inimigo *inimigo)
+{
+    inimigo->y += inimigo->velocidadeY;
+    inimigo->velocidadeY += GRAVIDADE;
+}
+bool verificarColisaoPlataformasInimigo(Inimigo *inimigo)
+{
+    for (int i = 0; i < qtd_plataformas; i++)
+    {
+        // Adiciona uma margem de segurança
+        const float margem = 5.0f;
+
+        bool dentroDosLimitesHorizontais =
+            inimigo->x + inimigo->w - margem > plataformas[i].x &&
+            inimigo->x + margem < plataformas[i].x + plataformas[i].w;
+
+        bool atingiuPorCima =
+            inimigo->y + inimigo->h >= plataformas[i].y &&
+            inimigo->y + inimigo->h <= plataformas[i].y + inimigo->velocidadeY;
+
+        if (dentroDosLimitesHorizontais && atingiuPorCima)
+        {
+            inimigo->y = plataformas[i].y - inimigo->h;
+            inimigo->velocidadeY = 0;
+            return true;
+        }
+    }
+    return false;
+}
 
 void movimentoVerticalInimigo(Inimigo *inimigo)
 {
-    const float FORCA_PULO = -80.0f;
-    
-    if (!inimigo->nochao)
+    aplicarGravidadeInimigo(inimigo);
+    const float forca_salto = -50.0f;
+
+    inimigo->nochao = verificarColisaoPlataformasInimigo(inimigo);
+
+    if (inimigo->pulando && inimigo->nochao)
     {
-        inimigo->y += inimigo->velocidadeY;
-        inimigo->velocidadeY += GRAVIDADE;
-        if (inimigo->vida > 0)
-        {
-            verificarColisaoChaoInimigo(inimigo);
-        }
-    }
-    else if (inimigo->pulando && inimigo->nochao)
-    {
-        inimigo->velocidadeY = FORCA_PULO;
-        inimigo->nochao = false;
+        inimigo->velocidadeY = forca_salto;
         inimigo->pulando = false;
+        inimigo->nochao = false;
+    }
+
+    if (inimigo->y > TELA_ALTURA + 50)
+    {
+        inimigo->vida--;
     }
 }
 
@@ -194,7 +227,7 @@ void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
     {
         reposicionaInimigo(inimigo);
     }
-    
+
     movimentoHorizontalInimigo(inimigo, jogador);
     movimentoVerticalInimigo(inimigo);
 }
@@ -221,11 +254,11 @@ Uint32 tornaJogadorMortal(Uint32 interval, void *param)
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
 {
-    if (jogador->x + jogador->w >= inimigo->x - 10 && 
+    if (jogador->x + jogador->w >= inimigo->x - 10 &&
         jogador->x <= inimigo->x + inimigo->w + 10 &&
-        jogador->y + jogador->h >= inimigo->y && 
+        jogador->y + jogador->h >= inimigo->y &&
         jogador->y <= inimigo->y + inimigo->h &&
-        inimigo->vida > 0)  // Só verifica colisão se o inimigo estiver vivo
+        inimigo->vida > 0) // Só verifica colisão se o inimigo estiver vivo
     {
         // Jogador pula no inimigo
         if (jogador->y + jogador->h <= inimigo->y + inimigo->h / 2)

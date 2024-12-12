@@ -139,7 +139,7 @@ bool iniciaJogador(Jogador *jogador, int selecao)
     return true;
 }
 
-void aplicarGravidade(Jogador *jogador)
+void aplicarGravidadeJogador(Jogador *jogador)
 {
     jogador->y += jogador->velocidadeY;
     jogador->velocidadeY += GRAVIDADE;
@@ -182,7 +182,7 @@ void jogadorSalta(Jogador *jogador)
         jogador->salta = false;
     }
 }
-
+/*
 bool verificarColisaoChao(Jogador *jogador)
 {
     if (jogador->y >= TELA_ALTURA - jogador->h - 50)
@@ -192,20 +192,25 @@ bool verificarColisaoChao(Jogador *jogador)
         return true;
     }
     return false;
-}
+}*/
 
 void movimentoVerticalJogador(Jogador *jogador)
 {
 
-    aplicarGravidade(jogador);
+    aplicarGravidadeJogador(jogador);
 
-    jogador->nochao = verificarColisaoPlataformas(jogador) || verificarColisaoChao(jogador);
+    jogador->nochao = verificarColisaoPlataformas(jogador);
 
     if (jogador->salta && jogador->nochao)
     {
         jogador->velocidadeY = jogador->forca_salto;
         jogador->salta = false;
         jogador->nochao = false;
+    }
+
+    if (jogador->y > TELA_ALTURA + 50)
+    {
+        jogador->vida--;
     }
 }
 

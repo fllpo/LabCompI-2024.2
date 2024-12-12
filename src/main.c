@@ -62,7 +62,6 @@ void limparRecursos()
 
 int main(int argc, char *args[])
 {
-    printf("Para fins de teste:\nRight Shift: +3 fichas (ao acabar o jogo)\n");
 
     if (!iniciaJanela())
     {
