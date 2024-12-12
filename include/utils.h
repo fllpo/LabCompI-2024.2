@@ -29,8 +29,7 @@ Mix_Chunk *coleta_sfx = NULL;
 Mix_Chunk *hit_sfx = NULL;
 Mix_Chunk *seleciona_sfx = NULL;
 
-Uint32 frameStart,
-    lastFrame = 0, frameTime;
+Uint32 frameStart, lastFrame = 0, frameTime;
 float deltaTime;
 
 void destroi();

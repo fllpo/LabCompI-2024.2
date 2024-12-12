@@ -265,11 +265,11 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
 
     SDL_QueryTexture(texturaAtual, NULL, NULL, &texturaLargura, &texturaAltura);
-    
+
     // Configura o retângulo de origem
     srcRect.w = texturaLargura;
     srcRect.h = texturaAltura;
-    
+
     // Se for o esquilo (verificando pela força do salto e velocidade)
     if (jogador->velocidade_movimento == 1000 && jogador->forca_salto == -60)
     {
@@ -277,11 +277,14 @@ void desenhaJogador(Jogador *jogador, SDL_Texture **idle, SDL_Texture **run, SDL
     }
 
     jogador->imune ? SDL_SetTextureAlphaMod(texturaAtual, 128) : SDL_SetTextureAlphaMod(texturaAtual, 255);
-    
+
     // Usa o srcRect para recortar o sprite
-    if (jogador->viradoParaEsquerda) {
+    if (jogador->viradoParaEsquerda)
+    {
         SDL_RenderCopyEx(renderizador, texturaAtual, &srcRect, &rectJogador, 0, NULL, SDL_FLIP_HORIZONTAL);
-    } else {
+    }
+    else
+    {
         SDL_RenderCopy(renderizador, texturaAtual, &srcRect, &rectJogador);
     }
 }

@@ -177,9 +177,6 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
         {
             switch (e->key.keysym.sym)
             {
-            case SDLK_ESCAPE:
-                telaPause();
-                break;
             case SDLK_d:
                 jogador->movDireita = true;
                 break;
@@ -204,7 +201,6 @@ void processaEventosJogo(Jogador *jogador, SDL_Event *e)
                 break;
             case SDLK_SPACE:
                 jogador->salta = false;
-
                 break;
             }
         }

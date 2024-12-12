@@ -185,6 +185,7 @@ void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
             // Jogador colidiu com o inimigo, mas não por cima
             if (jogador->resgatando == 0)
             {
+                Mix_PlayChannel(-1, hit_sfx, 0);
                 jogador->vida--;
             }
             else if (jogador->resgatando > 0)

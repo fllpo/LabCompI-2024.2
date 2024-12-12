@@ -18,7 +18,6 @@ int telaSelecaoPersonagem(Jogador *jogador)
     SDL_Rect molduraInterna = {150, 150, 300, 300};
     SDL_Rect imagemRect = {160, 160, 280, 280};
 
-    // Carregando as imagens dos personagens
     personagens[0] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Foxy/Sprites/idle/player-idle-1.png");
     personagens[1] = IMG_LoadTexture(renderizador, "assets/img/Characters/Players/Squirrel/Sprites/idle/player-idle-1.png");
 
@@ -27,15 +26,12 @@ int telaSelecaoPersonagem(Jogador *jogador)
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         SDL_RenderClear(renderizador);
 
-        // Desenhar a moldura externa (marrom)
-        SDL_SetRenderDrawColor(renderizador, 139, 69, 19, 255); // Cor marrom
+        SDL_SetRenderDrawColor(renderizador, 139, 69, 19, 255);
         SDL_RenderFillRect(renderizador, &molduraExterna);
 
-        // Desenhar a moldura interna (fundo da imagem)
         SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255);
         SDL_RenderFillRect(renderizador, &molduraInterna);
 
-        // Desenhar a imagem do personagem selecionado
         SDL_RenderCopy(renderizador, personagens[selecao], NULL, &imagemRect);
 
         escreveTexto("Raposa", 500, 200, BRANCO);
@@ -64,7 +60,6 @@ int telaSelecaoPersonagem(Jogador *jogador)
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_ESCAPE:
-                    destroi(janela);
                     exit(0);
                 case SDLK_UP:
                     if (selecao > 0)
@@ -74,7 +69,6 @@ int telaSelecaoPersonagem(Jogador *jogador)
                     }
                     break;
                 case SDLK_DOWN:
-                    Mix_PlayChannel(-1, seleciona_sfx, 0);
                     if (selecao < 1)
                     {
                         Mix_PlayChannel(-1, seleciona_sfx, 0);
@@ -82,6 +76,7 @@ int telaSelecaoPersonagem(Jogador *jogador)
                     }
                     break;
                 case SDLK_RETURN:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
                     menu = 0;
                     break;
                 }
@@ -90,7 +85,6 @@ int telaSelecaoPersonagem(Jogador *jogador)
         SDL_RenderPresent(renderizador);
     }
 
-    // Liberar as texturas dos personagens
     for (int i = 0; i < num_personagens; i++)
     {
         SDL_DestroyTexture(personagens[i]);
@@ -98,7 +92,7 @@ int telaSelecaoPersonagem(Jogador *jogador)
     jogador->fichas = 3;
     return selecao;
 }
-void telaRecordes() // OK
+void telaRecordes()
 {
     Recorde recordes[MAX_RECORDES];
     int numRecordes = 0, menu = 1;
@@ -140,6 +134,7 @@ void telaRecordes() // OK
             }
             else if (e.type == SDL_KEYDOWN)
             {
+                Mix_PlayChannel(-1, seleciona_sfx, 0);
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_ESCAPE:
@@ -155,34 +150,8 @@ void telaRecordes() // OK
         SDL_RenderPresent(renderizador);
     }
 }
-void telaPause() // TODO: Manter estados dos inimigos
-{
-    int pause = 1;
-    escreveTexto("Pausado", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
 
-    SDL_RenderPresent(renderizador);
-    while (pause)
-    {
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                destroi(janela);
-                exit(0);
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    pause = 0;
-                    break;
-                }
-            }
-        }
-    }
-}
-void telaFinal(Jogador *jogador) // TODO
+void telaFinal(Jogador *jogador)
 {
     jogador->fichas--;
     char nome[4] = {0};
@@ -232,6 +201,7 @@ void telaFinal(Jogador *jogador) // TODO
                         }
                         break;
                     case SDLK_RETURN:
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         if (i > 0)
                         {
                             final = 0;
@@ -264,33 +234,21 @@ void telaFinal(Jogador *jogador) // TODO
                 final = 0;
             }
         }
-        else // TODO
+        else
         {
-            escreveTexto("Pressione Enter para jogar novamente", 200, 200, BRANCO);
+            char texto[10];
+            sprintf(texto, "x%d", jogador->fichas);
+            escreveTexto(texto, TELA_ALTURA / 2 + 160, TELA_ALTURA / 2, BRANCO);
+            SDL_Rect imagemRect = {TELA_ALTURA / 2, TELA_ALTURA / 2 - 160 / 2, 160, 160};
+            SDL_RenderCopy(renderizador, idle[0], NULL, &imagemRect);
 
+            // reinicia jogo
             jogador->resgatando = 0;
-            exibeFichas(jogador->fichas);
 
-            while (SDL_PollEvent(&e))
-            {
-                if (e.type == SDL_QUIT)
-                {
-                    destroi(janela);
-                    exit(0);
-                }
-                else if (e.type == SDL_KEYDOWN)
-                {
-                    switch (e.key.keysym.sym)
-                    {
-                    case SDLK_ESCAPE:
-                        destroi(janela);
-                        exit(0);
-                    case SDLK_RETURN:
-                        final = 0;
-                        break;
-                    }
-                }
-            }
+            SDL_RenderPresent(renderizador);
+            SDL_Delay(2000);
+            final = 0;
+
             if (jogador->recorde < jogador->pontos)
             {
                 jogador->recorde = jogador->pontos;
@@ -299,7 +257,7 @@ void telaFinal(Jogador *jogador) // TODO
         SDL_RenderPresent(renderizador);
     }
 }
-void telaApresentacao() // OK
+void telaApresentacao()
 {
     SDL_Texture *logo_rural = IMG_LoadTexture(renderizador, "assets/img/rural_logo.png");
     SDL_SetTextureAlphaMod(logo_rural, 0);
@@ -342,7 +300,6 @@ void telaApresentacao() // OK
 }
 void telaInstrucoes() // TODO
 {
-
     int menu = 1;
 
     while (menu)
@@ -350,6 +307,7 @@ void telaInstrucoes() // TODO
         SDL_RenderClear(renderizador);
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         escreveTexto("Instrucoes", TELA_LARGURA / 2 - 50, TELA_ALTURA / 4 - 50, BRANCO);
+
         escreveTexto("A: esquerda", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 - 50, BRANCO);
         escreveTexto("D: direita", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2, BRANCO);
         escreveTexto("Espaco: Saltar", TELA_LARGURA / 2 - 50, TELA_ALTURA / 2 + 50, BRANCO);
