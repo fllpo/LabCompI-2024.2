@@ -14,7 +14,11 @@ Você controla um personagem que precisa salvar criaturas adoráveis enquanto ev
 
 ### Tela do Jogo
 
-Insira um gif de demonstração
+![Captura de tela de 2024-12-12 20-45-28](https://github.com/user-attachments/assets/b9eb995b-f5ba-486d-a65b-c1495dfb9738)
+
+### Tela de Reinício
+
+![Tela de Reinício](https://github.com/user-attachments/assets/588feec0-201a-4755-97f6-77e8091ed5cf)
 
 ### Tela de Recordes
 
@@ -25,8 +29,7 @@ Insira um gif de demonstração
 ![Tela de Instruções](https://github.com/user-attachments/assets/4be09ab4-e6db-48f8-9a7e-75678aa70b7c)
 
 ### Tela final
-
-![Tela Final](https://github.com/user-attachments/assets/4f13d2c4-f878-422c-a653-d88b031bfdd7)
+![Tela Final](https://github.com/user-attachments/assets/89cea80b-98f6-46c4-bb7e-93a40f512c66)
 
 ## 🚀 Como jogar
 
