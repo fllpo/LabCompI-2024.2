@@ -17,5 +17,6 @@ void liberaInimigos(void);
 void atualizaInimigo(Inimigo *inimigo, Jogador *jogador);
 void desenhaInimigo(Inimigo *inimigo);
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo);
+bool verificarColisaoChaoInimigo(Inimigo *inimigo);
 
 #endif
