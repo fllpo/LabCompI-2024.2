@@ -146,10 +146,10 @@ void renderiza()
     verificaTodasColisoesNPC(&jogador);
     verificaTodasColisoesInimigo(&jogador);
 
-    // exibeVida(jogador.vida);
-    // exibePontos(jogador.pontos);
-    // exibePosicao(jogador.x, jogador.y);     // fins de teste
-    // exibeQtdResgatando(jogador.resgatando); // fins de teste
+    exibeVida(jogador.vida);
+    exibePontos(jogador.pontos);
+    exibePosicao(jogador.x, jogador.y);     // fins de teste
+    exibeQtdResgatando(jogador.resgatando); // fins de teste
 
     SDL_RenderPresent(renderizador);
     limitaFPS();

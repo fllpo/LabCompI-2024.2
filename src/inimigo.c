@@ -102,63 +102,25 @@ void liberaInimigos()
 
 void movimentoHorizontalInimigo(Inimigo *inimigo, Jogador *jogador)
 {
-    float distancia = jogador->x - inimigo->x;
-    float distanciaAbs = fabs(distancia);
-    float distanciaY = jogador->y - inimigo->y;
+    int direcao = inimigo->viradoParaEsquerda ? -1 : 1;
+    float distancia = abs(inimigo->x - jogador->x);
 
-    const float DISTANCIA_PERSEGUICAO = 1600.0f;
-    const float DISTANCIA_PULO = 200.0f;
-    const float ALTURA_MINIMA_PULO = -50.0f;
-
-    // Só pula se o jogador estiver acima E próximo
-    if (inimigo->nochao &&
-        distanciaY < ALTURA_MINIMA_PULO &&
-        distanciaAbs < DISTANCIA_PULO)
+    if (distancia > 400)
     {
-        inimigo->pulando = true;
-    }
-
-    // Movimento horizontal - sempre persegue o jogador
-    if (distanciaAbs < DISTANCIA_PERSEGUICAO)
-    {
-        // Se o jogador estiver à direita do inimigo
-        if (distancia > 0)
+        if (inimigo->x < jogador->x)
         {
+            direcao = 1;
             inimigo->viradoParaEsquerda = 0;
-            // Move mais rápido se estiver longe
-            float velocidade = inimigo->velocidade_movimento;
-            if (distanciaAbs > 300)
-            {
-                velocidade *= 1.5f;
-            }
-            inimigo->x += velocidade * deltaTime;
         }
-        // Se o jogador estiver à esquerda do inimigo
-        else
+        else if (inimigo->x > jogador->x)
         {
+            direcao = -1;
             inimigo->viradoParaEsquerda = 1;
-            // Move mais rápido se estiver longe
-            float velocidade = inimigo->velocidade_movimento;
-            if (distanciaAbs > 300)
-            {
-                velocidade *= 1.5f;
-            }
-            inimigo->x -= velocidade * deltaTime;
         }
     }
+    inimigo->x += inimigo->velocidade_movimento * deltaTime * direcao;
 }
 
-bool verificarColisaoChaoInimigo(Inimigo *inimigo)
-{
-    if (inimigo->y >= TELA_ALTURA - inimigo->h - 50)
-    {
-        inimigo->y = TELA_ALTURA - inimigo->h - 50;
-        inimigo->nochao = true;
-        inimigo->velocidadeY = 0;
-        return true;
-    }
-    return false;
-}
 void aplicarGravidadeInimigo(Inimigo *inimigo)
 {
     inimigo->y += inimigo->velocidadeY;

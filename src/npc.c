@@ -7,7 +7,6 @@ int num_npcs;
 
 bool criaNPCs(int quantidade)
 {
-
     if (npc != NULL)
     {
         free(npc);

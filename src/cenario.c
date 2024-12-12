@@ -3,12 +3,15 @@
 #include "../include/estruturas.h"
 
 extern Jogador jogador;
-
+// mantenha y como multiplo de 200
 Plataforma plataformas[] = {
-    {-50, TELA_ALTURA - 50, 1000, 50},
-    {1200, TELA_ALTURA - 50, 5000, 50},
-    {450, TELA_ALTURA - 200, 150, 50},
-    {750, TELA_ALTURA - 400, 250, 50}};
+    {-50, TELA_ALTURA - 50, 1000, 50},  // chão
+    {1200, TELA_ALTURA - 50, 500, 50},  // chão
+    {1900, TELA_ALTURA - 50, 5000, 50}, // chão
+    {2500, TELA_ALTURA - 200, 400, 50}, // plataforma aerea
+    {450, TELA_ALTURA - 200, 150, 50},  // plataforma aerea
+    {750, TELA_ALTURA - 400, 250, 50}   // plataforma aerea
+};
 
 int qtd_plataformas = sizeof(plataformas) / sizeof(Plataforma);
 

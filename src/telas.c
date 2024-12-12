@@ -160,23 +160,19 @@ void telaFinal(Jogador *jogador)
 
     fadeOut();
 
-    if (jogador->fichas == 0)
+    while (final)
     {
-        // Contagem regressiva
-        for (int contador_final = 10; contador_final >= 0; contador_final--)
-        {
-            SDL_RenderClear(renderizador);
-            if (continuar)
-                break;
+        SDL_RenderClear(renderizador);
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
 
-            char texto[10];
-            sprintf(texto, "%d", contador_final);
-            escreveTexto(texto, TELA_LARGURA / 2 - 10, TELA_ALTURA / 2 - 20, BRANCO);
-            Mix_PlayChannel(-1, seleciona_sfx, 0);
-            escreveTexto("RSHIFT para adicionar mais fichas", TELA_LARGURA / 2 - 200, TELA_ALTURA - 50, BRANCO);
-            SDL_RenderPresent(renderizador);
-            SDL_Delay(1000);
-            SDL_RenderClear(renderizador);
+        // o jogador termina o jogo ou não decide continuar
+        if ((jogador->fichas == 0 && !continuar) || verificaFimDeJogo(jogador))
+        {
+            escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
+            escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
+            escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
+            exibePontos(jogador->pontos);
+            fflush(stdin);
 
             while (SDL_PollEvent(&e))
             {
@@ -192,29 +188,58 @@ void telaFinal(Jogador *jogador)
                         destroi(janela);
                         exit(0);
                     }
-                    else if (e.key.keysym.sym == SDLK_RSHIFT)
+                    else if (e.key.keysym.sym == SDLK_BACKSPACE && i > 0)
                     {
-                        jogador->fichas += 3;
-                        continuar = true;
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
+                        i--;
+                        nome[i] = '\0';
+                    }
+                    else if (e.key.keysym.sym == SDLK_RETURN && i > 0)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
                         final = 0;
-                        SDL_Delay(500);
+                    }
+                    else if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
+                    {
+                        Mix_PlayChannel(-1, seleciona_sfx, 0);
+                        nome[i] = toupper(e.key.keysym.sym);
+                        i++;
                     }
                 }
             }
-        }
 
-        while (final)
-        {
-            SDL_RenderClear(renderizador);
-            SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
-
-            // Se o jogador não tem fichas e não decidiu continuar
-            if ((jogador->fichas == 0 && !continuar) || verificaFimDeJogo(jogador))
+            if (i == 3 && final == 0)
             {
-                escreveTexto("Obrigado por jogar!", 200, 100, BRANCO);
-                escreveTexto("Escreva seu nome:", 100, TELA_ALTURA - 50, BRANCO);
+                if (jogador->recorde < jogador->pontos)
+                {
+                    jogador->recorde = jogador->pontos;
+                }
+                gravarRecordes(nome, jogador->recorde);
                 escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
-                fflush(stdin);
+                SDL_RenderPresent(renderizador);
+                SDL_Delay(1000);
+                final = 0;
+            }
+            SDL_RenderPresent(renderizador);
+        }
+        // se o jogador nao tem ficha e nao termina o jogo
+        else if (jogador->fichas == 0 && !verificaFimDeJogo(jogador))
+        {
+            // Contagem regressiva
+            for (int contador_final = 10; contador_final >= 0; contador_final--)
+            {
+                SDL_RenderClear(renderizador);
+                if (continuar)
+                    break;
+
+                char texto[10];
+                sprintf(texto, "%d", contador_final);
+                escreveTexto(texto, TELA_LARGURA / 2 - 10, TELA_ALTURA / 2 - 20, BRANCO);
+                Mix_PlayChannel(-1, seleciona_sfx, 0);
+                escreveTexto("RSHIFT para adicionar mais fichas", TELA_LARGURA / 2 - 200, TELA_ALTURA - 50, BRANCO);
+                SDL_RenderPresent(renderizador);
+                SDL_Delay(1000);
+                SDL_RenderClear(renderizador);
 
                 while (SDL_PollEvent(&e))
                 {
@@ -233,63 +258,32 @@ void telaFinal(Jogador *jogador)
                         else if (e.key.keysym.sym == SDLK_RSHIFT)
                         {
                             jogador->fichas += 3;
-                            exibeFichas(jogador->fichas);
+                            continuar = true;
                             final = 0;
                             SDL_Delay(500);
                         }
-                        else if (e.key.keysym.sym == SDLK_BACKSPACE && i > 0)
-                        {
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            i--;
-                            nome[i] = '\0';
-                        }
-                        else if (e.key.keysym.sym == SDLK_RETURN && i > 0)
-                        {
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            final = 0;
-                        }
-                        else if (i < 3 && e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
-                        {
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            nome[i] = toupper(e.key.keysym.sym);
-                            i++;
-                        }
                     }
-                }
-
-                if (i == 3 && final == 0)
-                {
-                    if (jogador->recorde < jogador->pontos)
-                    {
-                        jogador->recorde = jogador->pontos;
-                    }
-                    gravarRecordes(nome, jogador->recorde);
-                    escreveTexto(nome, TELA_LARGURA / 2, TELA_ALTURA - 50, BRANCO);
-                    SDL_RenderPresent(renderizador);
-                    SDL_Delay(1000);
-                    final = 0;
                 }
             }
-
-            SDL_RenderPresent(renderizador);
         }
-    }
-    else
-    {
-        char texto[10];
-        sprintf(texto, "x%d", jogador->fichas);
-        escreveTexto(texto, TELA_ALTURA / 2 + 160, TELA_ALTURA / 2, BRANCO);
-        SDL_Rect imagemRect = {TELA_ALTURA / 2, TELA_ALTURA / 2 - 160 / 2, 160, 160};
-        SDL_RenderCopy(renderizador, idle[0], NULL, &imagemRect);
-
-        jogador->resgatando = 0;
-        SDL_RenderPresent(renderizador);
-        SDL_Delay(2000);
-        final = 0;
-
-        if (jogador->recorde < jogador->pontos)
+        // se o jogador tem ficha
+        else if (jogador->fichas > 0 && !verificaFimDeJogo(jogador))
         {
-            jogador->recorde = jogador->pontos;
+            char texto[10];
+            sprintf(texto, "x%d", jogador->fichas);
+            escreveTexto(texto, TELA_ALTURA / 2 + 160, TELA_ALTURA / 2, BRANCO);
+            SDL_Rect imagemRect = {TELA_ALTURA / 2, TELA_ALTURA / 2 - 160 / 2, 160, 160};
+            SDL_RenderCopy(renderizador, idle[0], NULL, &imagemRect);
+
+            jogador->resgatando = 0;
+            SDL_RenderPresent(renderizador);
+            SDL_Delay(2000);
+            final = 0;
+
+            if (jogador->recorde < jogador->pontos)
+            {
+                jogador->recorde = jogador->pontos;
+            }
         }
     }
 }
@@ -357,6 +351,7 @@ void telaInstrucoes() // TODO
             }
             else if (e.type == SDL_KEYDOWN)
             {
+                Mix_PlayChannel(-1, seleciona_sfx, 0);
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_ESCAPE:
@@ -428,6 +423,7 @@ void telaInicial(Jogador *jogador) // OK
                     }
                     break;
                 case SDLK_RETURN:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
                     switch (selecao)
                     {
                     case 0:

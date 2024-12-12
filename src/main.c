@@ -10,7 +10,7 @@ bool iniciaPersonagens(int selecao)
 {
     iniciaJogador(&jogador, selecao);
 
-    if (!criaNPCs(2))
+    if (!criaNPCs(5))
         return false;
 
     if (!criaInimigos(2))
@@ -89,7 +89,7 @@ Inicio:
 
         telaFinal(&jogador);
 
-        if (jogador.fichas <= 0)
+        if (jogador.fichas <= 0 || verificaFimDeJogo(&jogador))
         {
             goto Inicio;
         }

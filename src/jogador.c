@@ -182,17 +182,6 @@ void jogadorSalta(Jogador *jogador)
         jogador->salta = false;
     }
 }
-/*
-bool verificarColisaoChao(Jogador *jogador)
-{
-    if (jogador->y >= TELA_ALTURA - jogador->h - 50)
-    {
-        jogador->velocidadeY = 0;
-        jogador->y = TELA_ALTURA - jogador->h - 50;
-        return true;
-    }
-    return false;
-}*/
 
 void movimentoVerticalJogador(Jogador *jogador)
 {
