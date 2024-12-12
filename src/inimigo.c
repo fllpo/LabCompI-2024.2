@@ -40,8 +40,9 @@ bool iniciaInimigo(Inimigo *inimigo)
     inimigo->y = TELA_ALTURA - inimigo->h - 50;
     inimigo->viradoParaEsquerda = 0;
     inimigo->velocidadeY = 0;
-    inimigo->velocidade_movimento = 200;
+    inimigo->velocidade_movimento = 300;
     inimigo->nochao = true;
+    inimigo->pulando = false;
 
     char caminho[256];
     inimigo_textura = (SDL_Texture **)calloc(4, sizeof(SDL_Texture *));
@@ -96,25 +97,52 @@ void liberaInimigos()
 
 void movimentoHorizontalInimigo(Inimigo *inimigo, Jogador *jogador)
 {
-    int direcao = inimigo->viradoParaEsquerda ? -1 : 1;
-    float distancia = abs(inimigo->x - jogador->x);
-
-    if (distancia > 400)
+    float distancia = jogador->x - inimigo->x;
+    float distanciaAbs = fabs(distancia);
+    float distanciaY = jogador->y - inimigo->y;
+    
+    const float DISTANCIA_PERSEGUICAO = 1600.0f;
+    const float DISTANCIA_PULO = 200.0f;
+    const float ALTURA_MINIMA_PULO = -100.0f;
+    
+    // Só pula se o jogador estiver acima E próximo
+    if (inimigo->nochao && 
+        distanciaY < ALTURA_MINIMA_PULO && 
+        distanciaAbs < DISTANCIA_PULO)
     {
-        if (inimigo->x < jogador->x)
+        inimigo->pulando = true;
+    }
+    
+    // Movimento horizontal - sempre persegue o jogador
+    if (distanciaAbs < DISTANCIA_PERSEGUICAO)
+    {
+        // Se o jogador estiver à direita do inimigo
+        if (distancia > 0)
         {
-            direcao = 1;
             inimigo->viradoParaEsquerda = 0;
+            // Move mais rápido se estiver longe
+            float velocidade = inimigo->velocidade_movimento;
+            if (distanciaAbs > 300)
+            {
+                velocidade *= 1.5f;
+            }
+            inimigo->x += velocidade * deltaTime;
         }
-        else if (inimigo->x > jogador->x)
+        // Se o jogador estiver à esquerda do inimigo
+        else
         {
-            direcao = -1;
             inimigo->viradoParaEsquerda = 1;
+            // Move mais rápido se estiver longe
+            float velocidade = inimigo->velocidade_movimento;
+            if (distanciaAbs > 300)
+            {
+                velocidade *= 1.5f;
+            }
+            inimigo->x -= velocidade * deltaTime;
         }
     }
-
-    inimigo->x += inimigo->velocidade_movimento * deltaTime * direcao;
 }
+
 bool verificarColisaoChaoInimigo(Inimigo *inimigo)
 {
     if (inimigo->y >= TELA_ALTURA - inimigo->h - 50)
@@ -126,8 +154,11 @@ bool verificarColisaoChaoInimigo(Inimigo *inimigo)
     }
     return false;
 }
+
 void movimentoVerticalInimigo(Inimigo *inimigo)
 {
+    const float FORCA_PULO = -80.0f;
+    
     if (!inimigo->nochao)
     {
         inimigo->y += inimigo->velocidadeY;
@@ -137,9 +168,33 @@ void movimentoVerticalInimigo(Inimigo *inimigo)
             verificarColisaoChaoInimigo(inimigo);
         }
     }
+    else if (inimigo->pulando && inimigo->nochao)
+    {
+        inimigo->velocidadeY = FORCA_PULO;
+        inimigo->nochao = false;
+        inimigo->pulando = false;
+    }
 }
+
+void reposicionaInimigo(Inimigo *inimigo)
+{
+    // Gera uma posição aleatória no chão
+    inimigo->x = rand() % (4500 - 2000) + 2000;
+    inimigo->y = TELA_ALTURA - inimigo->h - 50;
+    inimigo->vida = 1;
+    inimigo->nochao = true;
+    inimigo->pulando = false;
+    inimigo->velocidadeY = 0;
+}
+
 void atualizaInimigo(Inimigo *inimigo, Jogador *jogador)
 {
+    // Se o inimigo morreu, reposiciona ele
+    if (inimigo->vida <= 0)
+    {
+        reposicionaInimigo(inimigo);
+    }
+    
     movimentoHorizontalInimigo(inimigo, jogador);
     movimentoVerticalInimigo(inimigo);
 }
@@ -166,23 +221,22 @@ Uint32 tornaJogadorMortal(Uint32 interval, void *param)
 
 void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
 {
-    if (jogador->x + jogador->w >= inimigo->x - 10 && jogador->x <= inimigo->x + inimigo->w + 10 &&
-        jogador->y + jogador->h >= inimigo->y && jogador->y <= inimigo->y + inimigo->h)
+    if (jogador->x + jogador->w >= inimigo->x - 10 && 
+        jogador->x <= inimigo->x + inimigo->w + 10 &&
+        jogador->y + jogador->h >= inimigo->y && 
+        jogador->y <= inimigo->y + inimigo->h &&
+        inimigo->vida > 0)  // Só verifica colisão se o inimigo estiver vivo
     {
-
         // Jogador pula no inimigo
         if (jogador->y + jogador->h <= inimigo->y + inimigo->h / 2)
         {
-            inimigo->vida--;
-            inimigo->nochao = false;
+            inimigo->vida = 0; // Marca como morto ao invés de destruir
             jogador->pontos += 100;
             Mix_PlayChannel(-1, hit_sfx, 0);
-
             jogador->velocidadeY = -15;
         }
         else if (!jogador->imune)
         {
-            // Jogador colidiu com o inimigo, mas não por cima
             if (jogador->resgatando == 0)
             {
                 Mix_PlayChannel(-1, hit_sfx, 0);
@@ -191,30 +245,13 @@ void colisaoJogadorInimigo(Jogador *jogador, Inimigo *inimigo)
             else if (jogador->resgatando > 0)
             {
                 jogador->resgatando = 0;
-
-                for (int i = 0; i < num_inimigos; i++)
+                for (int i = 0; i < num_npcs; i++)
                 {
                     npc[i].resgatado = false;
-                    if (npc[i].viradoParaEsquerda)
-                    {
-                        npc[i].x += 500;
-                        if (npc[i].x >= 5000)
-                        {
-                            npc[i].x = 5000;
-                        }
-                    }
-                    else
-                    {
-                        npc[i].x -= 500;
-                        if (npc[i].x <= 0)
-                        {
-                            npc[i].x = 10;
-                        }
-                    }
                 }
-                jogador->imune = true;
-                SDL_AddTimer(3000, tornaJogadorMortal, jogador);
             }
+            jogador->imune = true;
+            SDL_AddTimer(1000, tornaJogadorMortal, jogador);
         }
     }
 }
