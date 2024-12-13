@@ -146,9 +146,20 @@ void renderiza()
     verificaTodasColisoesNPC(&jogador);
     verificaTodasColisoesInimigo(&jogador);
 
-    // Exibe a vida e pontos do jogador
-    exibeVida(jogador.vida);
-    exibePontos(jogador.pontos);
+    if (verificaFimDeJogo(&jogador))
+    {
+        char texto[16];
+        for (int i = 0; i <= jogador.pontos; i += 10)
+        {
+            SDL_RenderClear(renderizador);
+            desenhaCenario();
+            sprintf(texto, "%d", i);
+            escreveTexto(texto, TELA_LARGURA / 2 - 25, TELA_ALTURA / 2 - 25, BRANCO);
+            Mix_PlayChannel(-1, seleciona_sfx, 0);
+            SDL_RenderPresent(renderizador);
+        }
+        SDL_Delay(500);
+    }
 
     SDL_RenderPresent(renderizador);
     limitaFPS();
@@ -256,4 +267,3 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_DestroyTexture(texturaPreto);
     SDL_DestroyTexture(texturaBranco);
 }
-

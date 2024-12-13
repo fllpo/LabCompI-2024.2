@@ -18,8 +18,9 @@ int telaSelecaoPersonagem(Jogador *jogador)
     SDL_Rect molduraExterna = {145, 145, 310, 310};
     SDL_Rect molduraInterna = {150, 150, 300, 300};
     SDL_Rect imagemRect = {160, 160, 280, 280};
-    
-    if (fundo == NULL) {
+
+    if (fundo == NULL)
+    {
         printf("Erro ao carregar textura de fundo: %s\n", IMG_GetError());
         return 0;
     }
@@ -30,7 +31,7 @@ int telaSelecaoPersonagem(Jogador *jogador)
     while (menu)
     {
         SDL_RenderClear(renderizador);
-        
+
         // Renderiza o fundo
         SDL_RenderCopy(renderizador, fundo, NULL, NULL);
 
@@ -107,8 +108,9 @@ int telaSelecaoPersonagem(Jogador *jogador)
 void telaRecordes()
 {
     SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
-    
-    if (fundo == NULL) {
+
+    if (fundo == NULL)
+    {
         printf("Erro ao carregar textura de fundo: %s\n", IMG_GetError());
         return;
     }
@@ -134,10 +136,10 @@ void telaRecordes()
     {
         SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255);
         SDL_RenderClear(renderizador);
-        
+
         // Renderiza o fundo
         SDL_RenderCopy(renderizador, fundo, NULL, NULL);
-        
+
         // Adicione aqui o código para renderizar os recordes
         escreveTexto("Recordes", TELA_LARGURA / 2 - 50, 50, BRANCO);
         for (int i = 0; i < numRecordes; i++)
@@ -146,7 +148,7 @@ void telaRecordes()
             sprintf(texto, "%d. %s - %d", i + 1, recordes[i].nome, recordes[i].pontos);
             escreveTexto(texto, TELA_LARGURA / 2 - 100, 100 + i * 30, BRANCO);
         }
-        
+
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
@@ -349,8 +351,9 @@ void telaApresentacao()
 void telaInstrucoes()
 {
     SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
-    
-    if (fundo == NULL) {
+
+    if (fundo == NULL)
+    {
         printf("Erro ao carregar textura de fundo: %s\n", IMG_GetError());
         return;
     }
@@ -359,15 +362,15 @@ void telaInstrucoes()
     while (menu)
     {
         SDL_RenderClear(renderizador);
-        
+
         // Renderiza o fundo
         SDL_RenderCopy(renderizador, fundo, NULL, NULL);
-        
+
         // Centraliza o texto na tela
         escreveTexto("Instrucoes do Jogo", TELA_LARGURA / 2 - 100, 50, BRANCO);
         escreveTexto("Use as setas para mover e pular.", TELA_LARGURA / 2 - 150, 150, BRANCO);
         escreveTexto("Pressione ESC para voltar ao menu.", TELA_LARGURA / 2 - 150, 200, BRANCO);
-        
+
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
@@ -394,8 +397,9 @@ void telaInicial(Jogador *jogador)
     int inicial = 1, selecao = 0;
     SDL_Texture *fundo = IMG_LoadTexture(renderizador, "assets/img/Environments/SunnyLand/Layers/back.png");
     SDL_Texture *titulo = IMG_LoadTexture(renderizador, "assets/img/Rescue-Rush.png");
-    
-    if (fundo == NULL || titulo == NULL) {
+
+    if (fundo == NULL || titulo == NULL)
+    {
         printf("Erro ao carregar texturas: %s\n", IMG_GetError());
         return;
     }
@@ -403,43 +407,42 @@ void telaInicial(Jogador *jogador)
     // Obtém as dimensões originais da textura do título
     int w, h;
     SDL_QueryTexture(titulo, NULL, NULL, &w, &h);
-    
+
     // Ajuste o fator de escala para diminuir o título
     float escala = 0.5f;
     int novaLargura = w * escala;
     int novaAltura = h * escala;
-    
+
     // Centraliza o título na tela
     SDL_Rect tituloRect = {
-        TELA_LARGURA/2 - novaLargura/2,
+        TELA_LARGURA / 2 - novaLargura / 2,
         50,
         novaLargura,
-        novaAltura
-    };
+        novaAltura};
 
     // Posições ajustadas do menu (mais à esquerda)
-    const int MENU_X = TELA_LARGURA / 4;  // Posição X do menu (1/4 da tela)
-    const int MENU_Y_BASE = 300;           // Posição Y base do menu
-    const int MENU_Y_SPACING = 50;   
+    const int MENU_X = TELA_LARGURA / 4; // Posição X do menu (1/4 da tela)
+    const int MENU_Y_BASE = 300;         // Posição Y base do menu
+    const int MENU_Y_SPACING = 50;
 
     while (inicial)
     {
         SDL_RenderClear(renderizador);
-        
+
         SDL_RenderCopy(renderizador, fundo, NULL, NULL);
         SDL_RenderCopy(renderizador, titulo, NULL, &tituloRect);
-        
+
         // Renderiza os textos do menu com as novas posições
         if (selecao == 0)
             escreveTexto("> Iniciar <", MENU_X, MENU_Y_BASE, AMARELO);
         else
             escreveTexto("Iniciar", MENU_X, MENU_Y_BASE, BRANCO);
-            
+
         if (selecao == 1)
             escreveTexto("> Instrucoes <", MENU_X, MENU_Y_BASE + MENU_Y_SPACING, AMARELO);
         else
             escreveTexto("Instrucoes", MENU_X, MENU_Y_BASE + MENU_Y_SPACING, BRANCO);
-            
+
         if (selecao == 2)
             escreveTexto("> Recordes <", MENU_X, MENU_Y_BASE + (2 * MENU_Y_SPACING), AMARELO);
         else
@@ -452,42 +455,42 @@ void telaInicial(Jogador *jogador)
         {
             switch (e.type)
             {
-                case SDL_QUIT:
-                    inicial = 0;
-                    destroi(janela);
+            case SDL_QUIT:
+                inicial = 0;
+                destroi(janela);
+                break;
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_UP:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
+                    selecao--;
+                    if (selecao < 0)
+                        selecao = 2;
                     break;
-                case SDL_KEYDOWN:
-                    switch (e.key.keysym.sym)
+                case SDLK_DOWN:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
+                    selecao++;
+                    if (selecao > 2)
+                        selecao = 0;
+                    break;
+                case SDLK_RETURN:
+                    Mix_PlayChannel(-1, seleciona_sfx, 0);
+                    switch (selecao)
                     {
-                        case SDLK_UP:
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            selecao--;
-                            if (selecao < 0)
-                                selecao = 2;
-                            break;
-                        case SDLK_DOWN:
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            selecao++;
-                            if (selecao > 2)
-                                selecao = 0;
-                            break;
-                        case SDLK_RETURN:
-                            Mix_PlayChannel(-1, seleciona_sfx, 0);
-                            switch (selecao)
-                            {
-                                case 0:
-                                    inicial = 0;
-                                    break;
-                                case 1:
-                                    telaInstrucoes();
-                                    break;
-                                case 2:
-                                    telaRecordes();
-                                    break;
-                            }
-                            break;
+                    case 0:
+                        inicial = 0;
+                        break;
+                    case 1:
+                        telaInstrucoes();
+                        break;
+                    case 2:
+                        telaRecordes();
+                        break;
                     }
                     break;
+                }
+                break;
             }
         }
         SDL_RenderPresent(renderizador);
