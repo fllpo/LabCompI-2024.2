@@ -10,7 +10,8 @@ Você controla um personagem que precisa salvar criaturas adoráveis enquanto ev
 
 ### Menu Inicial
 
-![Menu inicial](https://github.com/user-attachments/assets/d06e9acc-46ed-4405-8f24-6c0f0713cfa0)
+![Menu inicial](https://github.com/user-attachments/assets/5439f964-6677-4021-8fcd-0aa9269224ad)
+
 
 ### Tela do Jogo
 
@@ -22,11 +23,17 @@ Você controla um personagem que precisa salvar criaturas adoráveis enquanto ev
 
 ### Tela de Recordes
 
-![Tela de Recordes](https://github.com/user-attachments/assets/b3b9b09f-2954-470b-ba15-863e7069666e)
+![Tela de Recordes](https://github.com/user-attachments/assets/f0128157-23a4-4a6a-bdf8-5922d9d31020)
+
 
 ### Tela de Instruções
 
-![Tela de Instruções](https://github.com/user-attachments/assets/4be09ab4-e6db-48f8-9a7e-75678aa70b7c)
+![Tela de Instruções](https://github.com/user-attachments/assets/0749b96e-818f-44e6-ad99-6726ca5428c6)
+
+### Tela de Seleção de personagens
+
+![Tela de Seleção](https://github.com/user-attachments/assets/f33f90b3-1e2b-4c1d-8463-28874c8a4fd4)
+
 
 ### Tela final
 ![Tela Final](https://github.com/user-attachments/assets/89cea80b-98f6-46c4-bb7e-93a40f512c66)
@@ -67,3 +74,4 @@ Execute
 
 - Linguagem: C
 - Bibliotecas adicionais: SDL2, SDL2TTF, SDL2Image
+
