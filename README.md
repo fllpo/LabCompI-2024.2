@@ -10,8 +10,7 @@ Você controla um personagem que precisa salvar criaturas adoráveis enquanto ev
 
 ### Menu Inicial
 
-![Menu inicial](https://github.com/user-attachments/assets/5439f964-6677-4021-8fcd-0aa9269224ad)
-
+![Captura de tela de 2024-12-13 01-22-57](https://github.com/user-attachments/assets/22127507-9f50-49a4-8080-14769658171c)
 
 ### Tela do Jogo
 
@@ -23,17 +22,16 @@ Você controla um personagem que precisa salvar criaturas adoráveis enquanto ev
 
 ### Tela de Recordes
 
-![Tela de Recordes](https://github.com/user-attachments/assets/f0128157-23a4-4a6a-bdf8-5922d9d31020)
-
+![Captura de tela de 2024-12-13 01-24-51](https://github.com/user-attachments/assets/57f3d985-2469-4128-965f-c01003687da3)
 
 ### Tela de Instruções
 
-![Tela de Instruções](https://github.com/user-attachments/assets/0749b96e-818f-44e6-ad99-6726ca5428c6)
+![image](https://github.com/user-attachments/assets/2559b2ce-ef89-4719-a40c-861c8a5782c4)
+
 
 ### Tela de Seleção de personagens
 
-![Tela de Seleção](https://github.com/user-attachments/assets/f33f90b3-1e2b-4c1d-8463-28874c8a4fd4)
-
+![Captura de tela de 2024-12-13 01-25-34](https://github.com/user-attachments/assets/cdbcd733-0ef0-4811-8f97-65a08255ffb1)
 
 ### Tela final
 ![Tela Final](https://github.com/user-attachments/assets/89cea80b-98f6-46c4-bb7e-93a40f512c66)
