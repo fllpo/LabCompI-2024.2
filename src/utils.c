@@ -146,10 +146,9 @@ void renderiza()
     verificaTodasColisoesNPC(&jogador);
     verificaTodasColisoesInimigo(&jogador);
 
-    // exibeVida(jogador.vida);
-    // exibePontos(jogador.pontos);
-    exibePosicao(jogador.x, jogador.y); // fins de teste
-    // exibeQtdResgatando(jogador.resgatando); // fins de teste
+    // Exibe a vida e pontos do jogador
+    exibeVida(jogador.vida);
+    exibePontos(jogador.pontos);
 
     SDL_RenderPresent(renderizador);
     limitaFPS();
@@ -257,3 +256,4 @@ void escreveTexto(char *texto, int x, int y, SDL_Color cor)
     SDL_DestroyTexture(texturaPreto);
     SDL_DestroyTexture(texturaBranco);
 }
+
