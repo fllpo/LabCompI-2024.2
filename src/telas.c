@@ -48,8 +48,6 @@ int telaSelecaoPersonagem(Jogador *jogador)
         escreveTexto("Raposa", 500, 200, BRANCO);
         escreveTexto("Esquilo", 500, 250, BRANCO);
 
-        exibeFichas(jogador->fichas);
-
         switch (selecao)
         {
         case 0:
@@ -449,7 +447,6 @@ void telaInicial(Jogador *jogador)
             escreveTexto("Recordes", MENU_X, MENU_Y_BASE + (2 * MENU_Y_SPACING), BRANCO);
 
         escreveTexto("Por Andre, Fellipe e Guilherme.", 10, TELA_ALTURA - 35, BRANCO);
-        exibeFichas(jogador->fichas);
 
         while (SDL_PollEvent(&e))
         {

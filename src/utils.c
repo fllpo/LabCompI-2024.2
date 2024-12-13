@@ -43,7 +43,7 @@ int iniciaJanela(void)
         return 0;
     }
 
-    janela = SDL_CreateWindow("SDL",
+    janela = SDL_CreateWindow("Rescue Rush",
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
                               TELA_LARGURA,
