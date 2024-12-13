@@ -13,7 +13,7 @@ bool iniciaPersonagens(int selecao)
     if (!criaNPCs(5))
         return false;
 
-    if (!criaInimigos(0))
+    if (!criaInimigos(2))
         return false;
 
     return true;
